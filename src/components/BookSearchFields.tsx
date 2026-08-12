@@ -7,20 +7,23 @@ import { BookCover } from "./BookCover";
 
 // Renders the title/author/coverUrl/googleBooksId fields under those exact
 // names, so any <form> wrapping this can be handled by an action that
-// reads plain FormData. `children` lands inside the same bordered group so
-// callers can add their own fields (picker, dates) to one cohesive set.
+// reads plain FormData. `children` and `footer` land inside the same
+// bordered group so callers can add their own fields and submit button to
+// one cohesive set.
 export function BookSearchFields({
   initialTitle = "",
   initialAuthor = "",
   initialCoverUrl = "",
   initialGoogleBooksId = "",
   children,
+  footer,
 }: {
   initialTitle?: string;
   initialAuthor?: string;
   initialCoverUrl?: string;
   initialGoogleBooksId?: string;
   children?: React.ReactNode;
+  footer?: React.ReactNode;
 }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<BookSearchResult[]>([]);
@@ -31,16 +34,22 @@ export function BookSearchFields({
   const [isSearching, startSearch] = useTransition();
   const [status, setStatus] = useState<string | null>(null);
 
+  // The detail fields stay hidden until a search result is chosen, which
+  // nudges people through lookup so covers actually get filled in. Editing
+  // an existing book starts revealed. Once revealed it stays that way, so
+  // clearing the title doesn't yank the fields out from under you.
+  const [revealed, setRevealed] = useState(Boolean(initialTitle));
+
   function runSearch() {
     startSearch(async () => {
       setStatus(null);
       try {
         const found = await searchBooks(query);
         setResults(found);
-        if (found.length === 0) setStatus("No matches — type the details in below.");
+        if (found.length === 0) setStatus("No matches for that.");
       } catch {
         setResults([]);
-        setStatus("Lookup unavailable — type the details in below.");
+        setStatus("Lookup unavailable right now.");
       }
     });
   }
@@ -52,12 +61,13 @@ export function BookSearchFields({
     setGoogleBooksId(result.googleBooksId);
     setResults([]);
     setStatus(null);
+    setRevealed(true);
   }
 
   return (
     <fieldset className="panel space-y-3 p-4">
       <div className="space-y-1.5">
-        <label className="label">Look up cover &amp; details</label>
+        <label className="label">Search for the book</label>
         <div className="flex gap-2">
           <input
             type="text"
@@ -83,7 +93,20 @@ export function BookSearchFields({
         </div>
       </div>
 
-      {status && <p className="label">{status}</p>}
+      {status && (
+        <p className="label">
+          {status}{" "}
+          {!revealed && (
+            <button
+              type="button"
+              onClick={() => setRevealed(true)}
+              className="underline hover:text-term-fg"
+            >
+              Enter it by hand
+            </button>
+          )}
+        </p>
+      )}
 
       {results.length > 0 && (
         <ul className="max-h-48 space-y-1 overflow-y-auto border border-term-fg/20 p-1">
@@ -107,33 +130,43 @@ export function BookSearchFields({
         </ul>
       )}
 
-      <div className="flex gap-3 border-t border-term-fg/20 pt-3">
-        {coverUrl && (
-          <div className="w-16 shrink-0">
-            <BookCover src={coverUrl} alt={title} />
+      {revealed ? (
+        <div className="flex gap-3 border-t border-term-fg/20 pt-3">
+          {coverUrl && (
+            <div className="w-16 shrink-0">
+              <BookCover src={coverUrl} alt={title} />
+            </div>
+          )}
+          <div className="flex-1 space-y-2">
+            <input
+              type="text"
+              name="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="TITLE"
+              required
+              className="w-full"
+            />
+            <input
+              type="text"
+              name="author"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              placeholder="AUTHOR"
+              className="w-full"
+            />
+            {children}
           </div>
-        )}
-        <div className="flex-1 space-y-2">
-          <input
-            type="text"
-            name="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="TITLE"
-            required
-            className="w-full"
-          />
-          <input
-            type="text"
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="AUTHOR"
-            className="w-full"
-          />
-          {children}
         </div>
-      </div>
+      ) : (
+        <p className="label border-t border-term-fg/20 pt-3">
+          Pick a result to fill in the details.
+        </p>
+      )}
+
+      {revealed && footer && (
+        <div className="border-t border-term-fg/20 pt-3">{footer}</div>
+      )}
 
       <input type="hidden" name="coverUrl" value={coverUrl} />
       <input type="hidden" name="googleBooksId" value={googleBooksId} />

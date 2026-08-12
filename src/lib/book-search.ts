@@ -23,6 +23,12 @@ type GoogleVolume = {
   };
 };
 
+/** Open Library often repeats an author across editions of the same work. */
+function joinAuthors(names: string[] | undefined): string {
+  if (!names?.length) return "Unknown author";
+  return [...new Set(names)].join(", ");
+}
+
 async function fetchJson(url: string): Promise<unknown> {
   const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) });
   if (!res.ok) throw new Error(`Book search failed (HTTP ${res.status}).`);
@@ -45,7 +51,7 @@ async function searchOpenLibrary(query: string): Promise<BookSearchResult[]> {
       // Stored in books.google_books_id - it's just an opaque provider ref.
       googleBooksId: doc.key ?? doc.title!,
       title: doc.title!,
-      author: doc.author_name?.length ? doc.author_name.join(", ") : "Unknown author",
+      author: joinAuthors(doc.author_name),
       coverUrl: doc.cover_i
         ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`
         : null,
@@ -64,7 +70,7 @@ async function searchGoogleBooks(query: string, apiKey: string): Promise<BookSea
     return {
       googleBooksId: item.id,
       title: info.title ?? "Untitled",
-      author: info.authors?.length ? info.authors.join(", ") : "Unknown author",
+      author: joinAuthors(info.authors),
       coverUrl: cover ? cover.replace("http://", "https://") : null,
     };
   });

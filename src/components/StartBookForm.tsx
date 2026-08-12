@@ -6,8 +6,14 @@ import { BookSearchFields } from "./BookSearchFields";
 
 export function StartBookForm({ members }: { members: Member[] }) {
   return (
-    <form action={startCurrentBook} className="space-y-4">
-      <BookSearchFields>
+    <form action={startCurrentBook}>
+      <BookSearchFields
+        footer={
+          <button type="submit" className="btn btn-primary">
+            Start this book
+          </button>
+        }
+      >
         <select name="pickerId" required defaultValue="" className="w-full">
           <option value="" disabled>
             PICKED BY…
@@ -31,10 +37,6 @@ export function StartBookForm({ members }: { members: Member[] }) {
           />
         </div>
       </BookSearchFields>
-
-      <button type="submit" className="btn btn-primary">
-        Start this book
-      </button>
     </form>
   );
 }
