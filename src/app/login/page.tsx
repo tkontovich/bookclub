@@ -11,31 +11,38 @@ export default async function LoginPage({
 
   return (
     <div className="flex flex-1 items-center justify-center p-4">
-      <form
-        action={login}
-        className="w-full max-w-sm space-y-4 rounded-lg border border-neutral-200 p-6 dark:border-neutral-800"
-      >
-        <div>
-          <h1 className="text-lg font-semibold">Book Club</h1>
-          <p className="text-sm text-neutral-500">Enter the shared password to continue.</p>
+      <form action={login} className="panel w-full max-w-sm space-y-4 p-6">
+        <div className="space-y-1">
+          <h1 className="font-display text-3xl leading-none text-term-bright">
+            CLIT Club
+            <span className="cursor-block" aria-hidden="true" />
+          </h1>
+          <p className="label">Authentication required</p>
         </div>
+
+        <p className="rule">{"-".repeat(120)}</p>
+
         {error && (
-          <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
-            Wrong password. Try again.
+          <p className="border border-term-fg/40 bg-term-fg/10 px-3 py-2 text-xs uppercase tracking-widest text-term-bright">
+            ! Access denied
           </p>
         )}
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          autoFocus
-          required
-          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-        />
-        <button
-          type="submit"
-          className="w-full rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-        >
+
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="label">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            name="password"
+            autoFocus
+            required
+            className="w-full"
+          />
+        </div>
+
+        <button type="submit" className="btn btn-primary w-full">
           Enter
         </button>
       </form>

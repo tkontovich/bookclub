@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { getSupabase } from "./supabase";
-import { getActiveMembers, getAllMembers, getCurrentBook } from "./data";
-import { searchGoogleBooks } from "./google-books";
+import { getActiveMembers, getAllMembers, getClubSettings, getCurrentBook } from "./data";
+import { searchForBooks } from "./book-search";
+import { todayIsoDate } from "./util";
 import type { BookSearchResult, Member } from "./types";
 
 function nonEmpty(formData: FormData, field: string): string | null {
@@ -57,22 +58,10 @@ export async function removeMember(formData: FormData): Promise<void> {
   revalidatePath("/");
 }
 
-export async function updateNextMeetingDate(formData: FormData): Promise<void> {
-  const nextMeetingDate = nonEmpty(formData, "nextMeetingDate");
-
-  const { error } = await getSupabase()
-    .from("club_settings")
-    .update({ next_meeting_date: nextMeetingDate })
-    .eq("id", true);
-  if (error) throw new Error(error.message);
-  revalidatePath("/settings");
-  revalidatePath("/");
-}
-
 // --- Current book -----------------------------------------------------------
 
 export async function searchBooks(query: string): Promise<BookSearchResult[]> {
-  return searchGoogleBooks(query);
+  return searchForBooks(query);
 }
 
 export async function startCurrentBook(formData: FormData): Promise<void> {
@@ -96,6 +85,14 @@ export async function startCurrentBook(formData: FormData): Promise<void> {
     status: "current",
   });
   if (error) throw new Error(error.message);
+
+  // The meeting date is set alongside the book rather than in settings; it
+  // later seeds the "discussed on" date when the book gets archived.
+  const { error: settingsError } = await getSupabase()
+    .from("club_settings")
+    .update({ next_meeting_date: nonEmpty(formData, "nextMeetingDate") })
+    .eq("id", true);
+  if (settingsError) throw new Error(settingsError.message);
 
   revalidatePath("/");
 }
@@ -121,8 +118,12 @@ export async function saveScores(formData: FormData): Promise<void> {
 
 export async function lockBook(formData: FormData): Promise<void> {
   const bookId = nonEmpty(formData, "bookId");
-  const dateDiscussed = nonEmpty(formData, "dateDiscussed");
-  if (!bookId || !dateDiscussed) throw new Error("Missing book or date.");
+  if (!bookId) throw new Error("Missing book.");
+
+  // The meeting date set when the book started is the date it was
+  // discussed; it stays correctable from Settings afterwards.
+  const settings = await getClubSettings();
+  const dateDiscussed = settings.next_meeting_date ?? todayIsoDate();
 
   const { error } = await getSupabase()
     .from("books")
@@ -130,7 +131,17 @@ export async function lockBook(formData: FormData): Promise<void> {
     .eq("id", bookId)
     .eq("status", "current");
   if (error) throw new Error(error.message);
+
+  // That meeting has now happened, so the date no longer applies until
+  // the next book is started.
+  const { error: settingsError } = await getSupabase()
+    .from("club_settings")
+    .update({ next_meeting_date: null })
+    .eq("id", true);
+  if (settingsError) throw new Error(settingsError.message);
+
   revalidatePath("/");
+  revalidatePath("/settings");
 }
 
 // --- Past books (backfilling history) ---------------------------------------
@@ -142,7 +153,7 @@ export async function addPastBook(formData: FormData): Promise<void> {
   const pickerId = nonEmpty(formData, "pickerId");
   if (!pickerId) throw new Error("Choose who picked this book.");
 
-  const dateDiscussed = nonEmpty(formData, "dateDiscussed");
+  const dateDiscussed = nonEmpty(formData, "bookDate");
   if (!dateDiscussed) throw new Error("Discussion date is required.");
 
   const { data: book, error: bookError } = await getSupabase()
@@ -173,4 +184,67 @@ export async function addPastBook(formData: FormData): Promise<void> {
   }
 
   revalidatePath("/");
+  revalidatePath("/settings");
+}
+
+/**
+ * Edits any book from Settings. For an archived book the date is when it
+ * was discussed; for the book being read now it's the next meeting date,
+ * which lives on club_settings rather than the book row.
+ */
+export async function updateBook(formData: FormData): Promise<void> {
+  const bookId = nonEmpty(formData, "bookId");
+  if (!bookId) throw new Error("Missing book.");
+
+  const title = nonEmpty(formData, "title");
+  if (!title) throw new Error("Title is required.");
+
+  const pickerId = nonEmpty(formData, "pickerId");
+  if (!pickerId) throw new Error("Choose who picked this book.");
+
+  const isCurrent = formData.get("status") === "current";
+  const bookDate = nonEmpty(formData, "bookDate");
+  if (!isCurrent && !bookDate) throw new Error("Discussion date is required.");
+
+  const { error } = await getSupabase()
+    .from("books")
+    .update({
+      title,
+      author: nonEmpty(formData, "author"),
+      cover_url: nonEmpty(formData, "coverUrl"),
+      google_books_id: nonEmpty(formData, "googleBooksId"),
+      picker_id: pickerId,
+      ...(isCurrent ? {} : { date_discussed: bookDate }),
+    })
+    .eq("id", bookId);
+  if (error) throw new Error(error.message);
+
+  if (isCurrent) {
+    const { error: settingsError } = await getSupabase()
+      .from("club_settings")
+      .update({ next_meeting_date: bookDate })
+      .eq("id", true);
+    if (settingsError) throw new Error(settingsError.message);
+  }
+
+  // Replace the whole score set so cleared entries actually disappear
+  // rather than lingering from the previous save.
+  const members = await getAllMembers();
+  const rows = buildScoreRows(formData, members, bookId).filter(
+    (row) => row.absent || row.score !== null,
+  );
+
+  const { error: clearError } = await getSupabase()
+    .from("scores")
+    .delete()
+    .eq("book_id", bookId);
+  if (clearError) throw new Error(clearError.message);
+
+  if (rows.length > 0) {
+    const { error: insertError } = await getSupabase().from("scores").insert(rows);
+    if (insertError) throw new Error(insertError.message);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/settings");
 }

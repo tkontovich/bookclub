@@ -8,10 +8,11 @@ import {
   getScoresForBook,
   getScoresForBooks,
 } from "@/lib/data";
-import { average, formatDate, todayIsoDate } from "@/lib/util";
+import { average, formatDate } from "@/lib/util";
 import { BookCover } from "@/components/BookCover";
 import { StartBookForm } from "@/components/StartBookForm";
 import { PastBooksList, type PastBookView } from "@/components/PastBooksList";
+import { ScoreRows, type ScoreEntry } from "@/components/ScoreRows";
 
 export default async function HomePage() {
   const [book, settings, activeMembers, memberMap, pastBooks] = await Promise.all([
@@ -45,27 +46,49 @@ export default async function HomePage() {
   });
 
   return (
-    <div className="space-y-10">
-      <section>
-        {!book ? (
-          <div className="space-y-4">
-            <h1 className="text-xl font-semibold">Start the next book</h1>
-            <StartBookForm members={activeMembers} />
-          </div>
-        ) : (
-          <CurrentBook
-            book={book}
-            settings={settings}
-            activeMembers={activeMembers}
-            memberMap={memberMap}
-          />
-        )}
+    <div>
+      {/* Full-bleed band, content still centred at max-w-3xl. */}
+      <section className="band w-full">
+        <div className="mx-auto max-w-3xl space-y-4 p-4 py-8">
+          {!book ? (
+            <>
+              <SectionHeading>Start the next book</SectionHeading>
+              <StartBookForm members={activeMembers} />
+            </>
+          ) : (
+            <CurrentBook
+              book={book}
+              settings={settings}
+              activeMembers={activeMembers}
+              memberMap={memberMap}
+            />
+          )}
+        </div>
       </section>
 
-      <section className="space-y-4 border-t border-neutral-200 pt-8 dark:border-neutral-800">
-        <h2 className="text-xl font-semibold">Past Books</h2>
+      <section className="mx-auto max-w-3xl space-y-4 p-4 pt-8">
+        <SectionHeading>Past Books</SectionHeading>
         <PastBooksList books={pastBookViews} />
       </section>
+    </div>
+  );
+}
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="font-display text-2xl uppercase leading-none text-term-bright">
+      <span className="text-term-dim">&gt;</span> {children}
+    </h2>
+  );
+}
+
+// Label ......................... value
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-baseline gap-2">
+      <span className="label shrink-0">{label}</span>
+      <span className="-translate-y-1 flex-1 border-b border-dotted border-term-fg/30" />
+      <span className="shrink-0 text-sm text-term-bright">{value}</span>
     </div>
   );
 }
@@ -85,90 +108,74 @@ async function CurrentBook({
   const scoreByMember = new Map(scores.map((s) => [s.member_id, s]));
   const avg = average(scores.filter((s) => !s.absent && s.score !== null).map((s) => s.score!));
   const picker = memberMap.get(book.picker_id);
+  const recorded = activeMembers.filter((m) => scoreByMember.has(m.id)).length;
+
+  const existing: Record<string, ScoreEntry> = {};
+  for (const s of scores) existing[s.member_id] = { score: s.score, absent: s.absent };
 
   return (
-    <div className="space-y-6">
-      <div className="flex gap-4">
-        <div className="w-32 shrink-0">
-          <BookCover src={book.cover_url} alt={book.title} />
+    <>
+      <SectionHeading>Now Reading</SectionHeading>
+
+      <div className="panel">
+        <div className="flex flex-col gap-5 p-5 sm:flex-row">
+          <div className="w-32 shrink-0">
+            <BookCover src={book.cover_url} alt={book.title} />
+          </div>
+          <div className="min-w-0 flex-1 space-y-3">
+            <h1 className="font-display text-4xl leading-none text-term-bright">{book.title}</h1>
+            <div className="space-y-1.5">
+              {book.author && <Row label="Author" value={book.author} />}
+              <Row label="Picked by" value={picker?.name ?? "Unknown"} />
+              <Row label="Next meeting" value={formatDate(settings.next_meeting_date)} />
+              <Row
+                label="Average"
+                value={
+                  avg !== null ? (
+                    <span className="font-display text-xl text-term-green">{avg.toFixed(1)}</span>
+                  ) : (
+                    <span className="text-term-dim">--</span>
+                  )
+                }
+              />
+            </div>
+          </div>
         </div>
-        <div className="space-y-1">
-          <h1 className="text-xl font-semibold">{book.title}</h1>
-          {book.author && <p className="text-neutral-600 dark:text-neutral-400">{book.author}</p>}
-          <p className="text-sm text-neutral-500">Picked by {picker?.name ?? "Unknown"}</p>
-          <p className="text-sm text-neutral-500">
-            Next meeting: {formatDate(settings.next_meeting_date)}
-          </p>
+
+        <details className="disclosure border-t border-term-fg/25">
+          <summary className="label px-5 py-3 hover:text-term-fg">
+            <span>
+              Score entry
+              <span className="ml-2 text-term-dim/70">
+                {recorded} / {activeMembers.length} recorded
+              </span>
+            </span>
+          </summary>
+          <div className="space-y-3 px-5 pb-5">
+            <p className="text-xs text-term-dim">
+              Record everyone&apos;s score as you discuss, or mark them absent if they didn&apos;t
+              make it.
+            </p>
+            <form action={saveScores} className="space-y-2">
+              <input type="hidden" name="bookId" value={book.id} />
+              <ScoreRows members={activeMembers} existing={existing} />
+              <button type="submit" className="btn btn-primary mt-2">
+                Save scores
+              </button>
+            </form>
+          </div>
+        </details>
+
+        <div className="flex flex-wrap items-center gap-3 border-t border-term-fg/25 px-5 py-3">
+          <span className="label">Finished?</span>
+          <form action={lockBook}>
+            <input type="hidden" name="bookId" value={book.id} />
+            <button type="submit" className="btn">
+              Lock &amp; archive
+            </button>
+          </form>
         </div>
       </div>
-
-      <section className="space-y-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-        <h2 className="font-medium">Scores</h2>
-        <p className="text-sm text-neutral-500">
-          Record everyone&apos;s score as you discuss, or mark them absent if they didn&apos;t
-          make it.
-        </p>
-        <form action={saveScores} className="space-y-2">
-          <input type="hidden" name="bookId" value={book.id} />
-          {activeMembers.map((member) => {
-            const existing = scoreByMember.get(member.id);
-            return (
-              <div key={member.id} className="flex items-center gap-3">
-                <span className="w-24 shrink-0 text-sm">{member.name}</span>
-                <input
-                  type="number"
-                  name={`score_${member.id}`}
-                  min={1}
-                  max={10}
-                  step={0.1}
-                  defaultValue={existing?.score ?? ""}
-                  placeholder="Score"
-                  className="w-24 rounded-md border border-neutral-300 px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-                />
-                <label className="flex items-center gap-1 text-sm text-neutral-500">
-                  <input
-                    type="checkbox"
-                    name={`absent_${member.id}`}
-                    defaultChecked={existing?.absent ?? false}
-                  />
-                  Absent
-                </label>
-              </div>
-            );
-          })}
-          <button
-            type="submit"
-            className="mt-2 rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-          >
-            Save scores
-          </button>
-        </form>
-        {avg !== null && (
-          <p className="border-t border-neutral-200 pt-2 text-sm font-medium dark:border-neutral-800">
-            Average: {avg.toFixed(1)}
-          </p>
-        )}
-      </section>
-
-      <section className="space-y-2 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-        <h2 className="font-medium">Finished discussing?</h2>
-        <form action={lockBook} className="flex flex-wrap items-center gap-2">
-          <input type="hidden" name="bookId" value={book.id} />
-          <input
-            type="date"
-            name="dateDiscussed"
-            defaultValue={todayIsoDate()}
-            required
-            className="rounded-md border border-neutral-300 px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-          />
-          <button
-            type="submit"
-            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-          >
-            Lock &amp; move to Past Books
-          </button>
-        </form>
-      </section>
-    </div>
+    </>
   );
 }

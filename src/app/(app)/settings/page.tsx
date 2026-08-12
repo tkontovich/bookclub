@@ -1,43 +1,71 @@
-import { addMember, removeMember, updateNextMeetingDate } from "@/lib/actions";
-import { getAllMembers, getClubSettings } from "@/lib/data";
-import { AddPastBookForm } from "@/components/AddPastBookForm";
+import { addMember, removeMember } from "@/lib/actions";
+import {
+  getAllMembers,
+  getClubSettings,
+  getCurrentBook,
+  getPastBooks,
+  getScoresForBooks,
+} from "@/lib/data";
+import { PastBooksAdmin, type BookAdminView } from "@/components/PastBooksAdmin";
+import type { ScoreEntry } from "@/components/ScoreRows";
 
 export default async function SettingsPage() {
-  const [allMembers, settings] = await Promise.all([getAllMembers(), getClubSettings()]);
+  const [allMembers, currentBook, pastBooks, settings] = await Promise.all([
+    getAllMembers(),
+    getCurrentBook(),
+    getPastBooks(),
+    getClubSettings(),
+  ]);
+
+  // The book being read now sits at the top of the same edit list.
+  const books = [...(currentBook ? [currentBook] : []), ...pastBooks];
+  const scores = await getScoresForBooks(books.map((b) => b.id));
+
+  const adminBooks: BookAdminView[] = books.map((b) => {
+    const byMember: Record<string, ScoreEntry> = {};
+    for (const s of scores) {
+      if (s.book_id === b.id) byMember[s.member_id] = { score: s.score, absent: s.absent };
+    }
+    const isCurrent = b.status === "current";
+    return {
+      id: b.id,
+      title: b.title,
+      author: b.author,
+      coverUrl: b.cover_url,
+      googleBooksId: b.google_books_id,
+      pickerId: b.picker_id,
+      status: isCurrent ? "current" : "past",
+      date: isCurrent ? settings.next_meeting_date : b.date_discussed,
+      scores: byMember,
+    };
+  });
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Settings</h1>
+    <div className="mx-auto max-w-3xl space-y-8 p-4">
+      <h1 className="font-display text-3xl uppercase leading-none text-term-bright">
+        <span className="text-term-dim">&gt;</span> Settings
+      </h1>
 
-      <section className="space-y-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-        <h2 className="font-medium">Next meeting</h2>
-        <form action={updateNextMeetingDate} className="flex flex-wrap items-center gap-2">
-          <input
-            type="date"
-            name="nextMeetingDate"
-            defaultValue={settings.next_meeting_date ?? ""}
-            className="rounded-md border border-neutral-300 px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-          />
-          <button
-            type="submit"
-            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-          >
-            Save
-          </button>
-        </form>
-      </section>
-
-      <section className="space-y-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-        <h2 className="font-medium">Members</h2>
+      <section className="panel space-y-3 p-5">
+        <h2 className="label text-term-fg">Members</h2>
         <ul className="space-y-1">
           {allMembers.map((m) => (
-            <li key={m.id} className="flex items-center justify-between text-sm">
-              <span className={m.active ? "" : "text-neutral-400 line-through"}>{m.name}</span>
+            <li key={m.id} className="flex items-baseline gap-2">
+              <span
+                className={
+                  m.active
+                    ? "shrink-0 text-sm uppercase tracking-wider text-term-bright"
+                    : "shrink-0 text-sm uppercase tracking-wider text-term-dim line-through"
+                }
+              >
+                {m.name}
+              </span>
+              <span className="-translate-y-1 flex-1 border-b border-dotted border-term-fg/30" />
               {m.active && (
-                <form action={removeMember}>
+                <form action={removeMember} className="shrink-0">
                   <input type="hidden" name="memberId" value={m.id} />
-                  <button type="submit" className="text-neutral-500 underline hover:text-neutral-800 dark:hover:text-neutral-200">
-                    Remove
+                  <button type="submit" className="label hover:text-term-fg">
+                    [ Remove ]
                   </button>
                 </form>
               )}
@@ -45,29 +73,15 @@ export default async function SettingsPage() {
           ))}
         </ul>
         <form action={addMember} className="flex flex-wrap items-center gap-2 pt-2">
-          <input
-            type="text"
-            name="name"
-            placeholder="New member name"
-            required
-            className="rounded-md border border-neutral-300 px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-          />
-          <button
-            type="submit"
-            className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-          >
+          <input type="text" name="name" placeholder="NEW MEMBER NAME" required />
+          <button type="submit" className="btn btn-primary">
             Add
           </button>
         </form>
       </section>
 
-      <section className="space-y-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
-        <h2 className="font-medium">Add a past book</h2>
-        <p className="text-sm text-neutral-500">
-          For backfilling books you&apos;ve already read and discussed. Includes anyone in the
-          member list, even if they&apos;ve since been removed.
-        </p>
-        <AddPastBookForm members={allMembers} />
+      <section className="panel space-y-3 p-5">
+        <PastBooksAdmin books={adminBooks} members={allMembers} />
       </section>
     </div>
   );

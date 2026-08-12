@@ -7,21 +7,10 @@ import { BookSearchFields } from "./BookSearchFields";
 export function StartBookForm({ members }: { members: Member[] }) {
   return (
     <form action={startCurrentBook} className="space-y-4">
-      <BookSearchFields />
-
-      <div className="flex items-center gap-2">
-        <label htmlFor="pickerId" className="text-sm text-neutral-500">
-          Picked by
-        </label>
-        <select
-          id="pickerId"
-          name="pickerId"
-          required
-          defaultValue=""
-          className="rounded-md border border-neutral-300 px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-900"
-        >
+      <BookSearchFields>
+        <select name="pickerId" required defaultValue="" className="w-full">
           <option value="" disabled>
-            Select…
+            PICKED BY…
           </option>
           {members.map((m) => (
             <option key={m.id} value={m.id}>
@@ -29,12 +18,21 @@ export function StartBookForm({ members }: { members: Member[] }) {
             </option>
           ))}
         </select>
-      </div>
+        <div className="space-y-1.5">
+          <label htmlFor="nextMeetingDate" className="label block">
+            Next meeting
+          </label>
+          <input
+            id="nextMeetingDate"
+            type="date"
+            name="nextMeetingDate"
+            required
+            className="w-full"
+          />
+        </div>
+      </BookSearchFields>
 
-      <button
-        type="submit"
-        className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-      >
+      <button type="submit" className="btn btn-primary">
         Start this book
       </button>
     </form>
