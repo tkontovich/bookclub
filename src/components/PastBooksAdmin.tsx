@@ -24,9 +24,11 @@ export type BookAdminView = {
 export function PastBooksAdmin({
   books,
   members,
+  canEdit,
 }: {
   books: BookAdminView[];
   members: Member[];
+  canEdit: boolean;
 }) {
   // `null` = closed, `"new"` = add modal, otherwise the book being edited.
   const [target, setTarget] = useState<BookAdminView | "new" | null>(null);
@@ -35,9 +37,11 @@ export function PastBooksAdmin({
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-3">
         <h2 className="label text-term-fg">Books</h2>
-        <button type="button" onClick={() => setTarget("new")} className="btn btn-primary">
-          + Add past book
-        </button>
+        {canEdit && (
+          <button type="button" onClick={() => setTarget("new")} className="btn btn-primary">
+            + Add past book
+          </button>
+        )}
       </div>
 
       {books.length === 0 ? (
@@ -60,13 +64,15 @@ export function PastBooksAdmin({
                 </p>
                 {book.author && <p className="label truncate">{book.author}</p>}
               </div>
-              <button
-                type="button"
-                onClick={() => setTarget(book)}
-                className="label shrink-0 hover:text-term-fg"
-              >
-                [ Edit ]
-              </button>
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={() => setTarget(book)}
+                  className="label shrink-0 hover:text-term-fg"
+                >
+                  [ Edit ]
+                </button>
+              )}
             </li>
           ))}
         </ul>

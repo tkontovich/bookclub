@@ -1,11 +1,31 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { getSupabase } from "./supabase";
 import { getActiveMembers, getAllMembers, getClubSettings, getCurrentBook } from "./data";
 import { searchForBooks } from "./book-search";
+import { SESSION_COOKIE_NAME, isUnlocked } from "./session";
 import { todayIsoDate } from "./util";
 import type { BookSearchResult, Member } from "./types";
+
+/**
+ * Every write goes through here. Server actions are POST endpoints that
+ * anyone can call directly, so hiding the edit UI is not a boundary -
+ * this check is. Must be the first line of any mutating action.
+ */
+async function requireUnlocked(): Promise<void> {
+  if (!(await isUnlocked())) {
+    throw new Error("Editing is locked. Switch edit mode on first.");
+  }
+}
+
+/** Turns edit mode off. Clearing the cookie re-renders the current page. */
+export async function lockSite(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete(SESSION_COOKIE_NAME);
+  revalidatePath("/", "layout");
+}
 
 function nonEmpty(formData: FormData, field: string): string | null {
   const value = formData.get(field);
@@ -35,6 +55,7 @@ function buildScoreRows(formData: FormData, members: Member[], bookId: string): 
 // --- Members / settings -----------------------------------------------------
 
 export async function addMember(formData: FormData): Promise<void> {
+  await requireUnlocked();
   const name = nonEmpty(formData, "name");
   if (!name) throw new Error("Name is required.");
 
@@ -49,6 +70,7 @@ export async function addMember(formData: FormData): Promise<void> {
 }
 
 export async function removeMember(formData: FormData): Promise<void> {
+  await requireUnlocked();
   const memberId = nonEmpty(formData, "memberId");
   if (!memberId) throw new Error("Missing member.");
 
@@ -61,10 +83,12 @@ export async function removeMember(formData: FormData): Promise<void> {
 // --- Current book -----------------------------------------------------------
 
 export async function searchBooks(query: string): Promise<BookSearchResult[]> {
+  await requireUnlocked();
   return searchForBooks(query);
 }
 
 export async function startCurrentBook(formData: FormData): Promise<void> {
+  await requireUnlocked();
   const currentBook = await getCurrentBook();
   if (currentBook) {
     throw new Error("Lock the current book before starting a new one.");
@@ -98,6 +122,7 @@ export async function startCurrentBook(formData: FormData): Promise<void> {
 }
 
 export async function saveScores(formData: FormData): Promise<void> {
+  await requireUnlocked();
   const bookId = nonEmpty(formData, "bookId");
   if (!bookId) throw new Error("Missing book.");
 
@@ -117,6 +142,7 @@ export async function saveScores(formData: FormData): Promise<void> {
 }
 
 export async function lockBook(formData: FormData): Promise<void> {
+  await requireUnlocked();
   const bookId = nonEmpty(formData, "bookId");
   if (!bookId) throw new Error("Missing book.");
 
@@ -147,6 +173,7 @@ export async function lockBook(formData: FormData): Promise<void> {
 // --- Past books (backfilling history) ---------------------------------------
 
 export async function addPastBook(formData: FormData): Promise<void> {
+  await requireUnlocked();
   const title = nonEmpty(formData, "title");
   if (!title) throw new Error("Title is required.");
 
@@ -193,6 +220,7 @@ export async function addPastBook(formData: FormData): Promise<void> {
  * which lives on club_settings rather than the book row.
  */
 export async function updateBook(formData: FormData): Promise<void> {
+  await requireUnlocked();
   const bookId = nonEmpty(formData, "bookId");
   if (!bookId) throw new Error("Missing book.");
 

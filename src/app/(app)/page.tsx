@@ -8,6 +8,7 @@ import {
   getScoresForBook,
   getScoresForBooks,
 } from "@/lib/data";
+import { isUnlocked } from "@/lib/session";
 import { average, formatDate } from "@/lib/util";
 import { BookCover } from "@/components/BookCover";
 import { StartBookForm } from "@/components/StartBookForm";
@@ -15,12 +16,13 @@ import { PastBooksList, type PastBookView } from "@/components/PastBooksList";
 import { ScoreRows, type ScoreEntry } from "@/components/ScoreRows";
 
 export default async function HomePage() {
-  const [book, settings, activeMembers, memberMap, pastBooks] = await Promise.all([
+  const [book, settings, activeMembers, memberMap, pastBooks, canEdit] = await Promise.all([
     getCurrentBook(),
     getClubSettings(),
     getActiveMembers(),
     getMemberMap(),
     getPastBooks(),
+    isUnlocked(),
   ]);
 
   const pastScores = await getScoresForBooks(pastBooks.map((b) => b.id));
@@ -53,7 +55,13 @@ export default async function HomePage() {
           {!book ? (
             <>
               <SectionHeading>Start the next book</SectionHeading>
-              <StartBookForm members={activeMembers} />
+              {canEdit ? (
+                <StartBookForm members={activeMembers} />
+              ) : (
+                <p className="label">
+                  Nothing being read right now. Switch edit mode on to pick the next book.
+                </p>
+              )}
             </>
           ) : (
             <CurrentBook
@@ -61,6 +69,7 @@ export default async function HomePage() {
               settings={settings}
               activeMembers={activeMembers}
               memberMap={memberMap}
+              canEdit={canEdit}
             />
           )}
         </div>
@@ -98,11 +107,13 @@ async function CurrentBook({
   settings,
   activeMembers,
   memberMap,
+  canEdit,
 }: {
   book: NonNullable<Awaited<ReturnType<typeof getCurrentBook>>>;
   settings: Awaited<ReturnType<typeof getClubSettings>>;
   activeMembers: Awaited<ReturnType<typeof getActiveMembers>>;
   memberMap: Awaited<ReturnType<typeof getMemberMap>>;
+  canEdit: boolean;
 }) {
   const scores = await getScoresForBook(book.id);
   const scoreByMember = new Map(scores.map((s) => [s.member_id, s]));
@@ -145,36 +156,64 @@ async function CurrentBook({
         <details className="disclosure border-t border-term-fg/25">
           <summary className="label px-5 py-3 hover:text-term-fg">
             <span>
-              Score entry
+              Scores
               <span className="ml-2 text-term-dim/70">
                 {recorded} / {activeMembers.length} recorded
               </span>
             </span>
           </summary>
           <div className="space-y-3 px-5 pb-5">
-            <p className="text-xs text-term-dim">
-              Record everyone&apos;s score as you discuss, or mark them absent if they didn&apos;t
-              make it.
-            </p>
-            <form action={saveScores} className="space-y-2">
-              <input type="hidden" name="bookId" value={book.id} />
-              <ScoreRows members={activeMembers} existing={existing} />
-              <button type="submit" className="btn btn-primary mt-2">
-                Save scores
-              </button>
-            </form>
+            {canEdit ? (
+              <>
+                <p className="text-xs text-term-dim">
+                  Record everyone&apos;s score as you discuss, or mark them absent if they
+                  didn&apos;t make it.
+                </p>
+                <form action={saveScores} className="space-y-2">
+                  <input type="hidden" name="bookId" value={book.id} />
+                  <ScoreRows members={activeMembers} existing={existing} />
+                  <button type="submit" className="btn btn-primary mt-2">
+                    Save scores
+                  </button>
+                </form>
+              </>
+            ) : recorded === 0 ? (
+              <p className="label">No scores recorded yet.</p>
+            ) : (
+              <ul className="space-y-1">
+                {activeMembers.map((member) => {
+                  const entry = existing[member.id];
+                  if (!entry) return null;
+                  return (
+                    <li key={member.id} className="flex items-baseline gap-2 text-sm">
+                      <span className="shrink-0 text-term-fg">{member.name}</span>
+                      <span className="-translate-y-1 flex-1 border-b border-dotted border-term-fg/30" />
+                      <span
+                        className={
+                          entry.absent ? "label shrink-0" : "shrink-0 tabular-nums text-term-bright"
+                        }
+                      >
+                        {entry.absent ? "Absent" : entry.score!.toFixed(1)}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
         </details>
 
-        <div className="flex flex-wrap items-center gap-3 border-t border-term-fg/25 px-5 py-3">
-          <span className="label">Finished?</span>
-          <form action={lockBook}>
-            <input type="hidden" name="bookId" value={book.id} />
-            <button type="submit" className="btn">
-              Lock &amp; archive
-            </button>
-          </form>
-        </div>
+        {canEdit && (
+          <div className="flex flex-wrap items-center gap-3 border-t border-term-fg/25 px-5 py-3">
+            <span className="label">Finished?</span>
+            <form action={lockBook}>
+              <input type="hidden" name="bookId" value={book.id} />
+              <button type="submit" className="btn">
+                Lock &amp; archive
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </>
   );

@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto";
+import { cookies } from "next/headers";
 
 export const SESSION_COOKIE_NAME = "bookclub_session";
 
@@ -34,6 +35,15 @@ export function isValidSessionToken(token: string | undefined): boolean {
   const [payload, signature] = token.split(".");
   if (payload !== SESSION_PAYLOAD || !signature) return false;
   return constantTimeEqual(signature, hmac(getSessionSecret(), SESSION_PAYLOAD));
+}
+
+/**
+ * Whether this visitor has edit mode switched on. The whole site is
+ * publicly readable; this only governs writes.
+ */
+export async function isUnlocked(): Promise<boolean> {
+  const cookieStore = await cookies();
+  return isValidSessionToken(cookieStore.get(SESSION_COOKIE_NAME)?.value);
 }
 
 export function isCorrectSitePassword(candidate: string): boolean {
