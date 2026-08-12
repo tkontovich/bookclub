@@ -1,5 +1,6 @@
 import { addMember, removeMember, updateNextMeetingDate } from "@/lib/actions";
 import { getAllMembers, getClubSettings } from "@/lib/data";
+import { AddPastBookForm } from "@/components/AddPastBookForm";
 
 export default async function SettingsPage() {
   const [allMembers, settings] = await Promise.all([getAllMembers(), getClubSettings()]);
@@ -58,6 +59,15 @@ export default async function SettingsPage() {
             Add
           </button>
         </form>
+      </section>
+
+      <section className="space-y-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800">
+        <h2 className="font-medium">Add a past book</h2>
+        <p className="text-sm text-neutral-500">
+          For backfilling books you&apos;ve already read and discussed. Includes anyone in the
+          member list, even if they&apos;ve since been removed.
+        </p>
+        <AddPastBookForm members={allMembers} />
       </section>
     </div>
   );

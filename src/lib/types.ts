@@ -13,7 +13,6 @@ export type Book = {
   title: string;
   author: string | null;
   cover_url: string | null;
-  description: string | null;
   google_books_id: string | null;
   picker_id: string;
   status: BookStatus;
@@ -40,5 +39,4 @@ export type BookSearchResult = {
   title: string;
   author: string;
   coverUrl: string | null;
-  description: string;
 };

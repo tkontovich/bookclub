@@ -5,7 +5,6 @@ type GoogleBooksVolume = {
   volumeInfo?: {
     title?: string;
     authors?: string[];
-    description?: string;
     imageLinks?: {
       thumbnail?: string;
       smallThumbnail?: string;
@@ -36,7 +35,6 @@ export async function searchGoogleBooks(query: string): Promise<BookSearchResult
       title: info.title ?? "Untitled",
       author: info.authors?.length ? info.authors.join(", ") : "Unknown author",
       coverUrl: cover ? cover.replace("http://", "https://") : null,
-      description: info.description ?? "",
     };
   });
 }

@@ -1,12 +1,10 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { getSupabase } from "./supabase";
-import { getActiveMembers, getCurrentBook } from "./data";
-import { MEMBER_COOKIE_NAME } from "./session";
+import { getActiveMembers, getAllMembers, getCurrentBook } from "./data";
 import { searchGoogleBooks } from "./google-books";
-import type { BookSearchResult } from "./types";
+import type { BookSearchResult, Member } from "./types";
 
 function nonEmpty(formData: FormData, field: string): string | null {
   const value = formData.get(field);
@@ -15,18 +13,21 @@ function nonEmpty(formData: FormData, field: string): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-// --- Identity -------------------------------------------------------------
+type ScoreRow = { book_id: string; member_id: string; absent: boolean; score: number | null };
 
-export async function setActiveMember(formData: FormData): Promise<void> {
-  const memberId = nonEmpty(formData, "memberId");
-  if (!memberId) return;
-  const cookieStore = await cookies();
-  cookieStore.set(MEMBER_COOKIE_NAME, memberId, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 365,
+function buildScoreRows(formData: FormData, members: Member[], bookId: string): ScoreRow[] {
+  return members.map((member) => {
+    const absent = formData.get(`absent_${member.id}`) === "on";
+    const scoreRaw = formData.get(`score_${member.id}`);
+    let score: number | null = null;
+    if (!absent && typeof scoreRaw === "string" && scoreRaw.trim() !== "") {
+      const parsed = Math.round(Number(scoreRaw) * 10) / 10;
+      if (!Number.isFinite(parsed) || parsed < 1 || parsed > 10) {
+        throw new Error(`${member.name}'s score must be between 1 and 10.`);
+      }
+      score = parsed;
+    }
+    return { book_id: bookId, member_id: member.id, absent, score };
   });
 }
 
@@ -90,7 +91,6 @@ export async function startCurrentBook(formData: FormData): Promise<void> {
     title,
     author: nonEmpty(formData, "author"),
     cover_url: nonEmpty(formData, "coverUrl"),
-    description: nonEmpty(formData, "description"),
     google_books_id: nonEmpty(formData, "googleBooksId"),
     picker_id: pickerId,
     status: "current",
@@ -105,30 +105,18 @@ export async function saveScores(formData: FormData): Promise<void> {
   if (!bookId) throw new Error("Missing book.");
 
   const members = await getActiveMembers();
-  const rows = members.map((member) => {
-    const absent = formData.get(`absent_${member.id}`) === "on";
-    const scoreRaw = formData.get(`score_${member.id}`);
-    let score: number | null = null;
-    if (!absent && typeof scoreRaw === "string" && scoreRaw.trim() !== "") {
-      const parsed = Math.round(Number(scoreRaw) * 10) / 10;
-      if (!Number.isFinite(parsed) || parsed < 1 || parsed > 10) {
-        throw new Error(`${member.name}'s score must be between 1 and 10.`);
-      }
-      score = parsed;
-    }
-    return { book_id: bookId, member_id: member.id, absent, score };
-  });
+  const rows = buildScoreRows(formData, members, bookId).filter(
+    (row) => row.absent || row.score !== null,
+  );
 
-  const toSave = rows.filter((row) => row.absent || row.score !== null);
-  if (toSave.length > 0) {
+  if (rows.length > 0) {
     const { error } = await getSupabase()
       .from("scores")
-      .upsert(toSave, { onConflict: "book_id,member_id" });
+      .upsert(rows, { onConflict: "book_id,member_id" });
     if (error) throw new Error(error.message);
   }
 
   revalidatePath("/");
-  revalidatePath("/past");
 }
 
 export async function lockBook(formData: FormData): Promise<void> {
@@ -143,5 +131,46 @@ export async function lockBook(formData: FormData): Promise<void> {
     .eq("status", "current");
   if (error) throw new Error(error.message);
   revalidatePath("/");
-  revalidatePath("/past");
+}
+
+// --- Past books (backfilling history) ---------------------------------------
+
+export async function addPastBook(formData: FormData): Promise<void> {
+  const title = nonEmpty(formData, "title");
+  if (!title) throw new Error("Title is required.");
+
+  const pickerId = nonEmpty(formData, "pickerId");
+  if (!pickerId) throw new Error("Choose who picked this book.");
+
+  const dateDiscussed = nonEmpty(formData, "dateDiscussed");
+  if (!dateDiscussed) throw new Error("Discussion date is required.");
+
+  const { data: book, error: bookError } = await getSupabase()
+    .from("books")
+    .insert({
+      title,
+      author: nonEmpty(formData, "author"),
+      cover_url: nonEmpty(formData, "coverUrl"),
+      google_books_id: nonEmpty(formData, "googleBooksId"),
+      picker_id: pickerId,
+      status: "past",
+      date_discussed: dateDiscussed,
+    })
+    .select("id")
+    .single();
+  if (bookError || !book) throw new Error(bookError?.message ?? "Could not add the book.");
+
+  const members = await getAllMembers();
+  const rows = buildScoreRows(formData, members, book.id).filter(
+    (row) => row.absent || row.score !== null,
+  );
+
+  if (rows.length > 0) {
+    const { error: scoresError } = await getSupabase()
+      .from("scores")
+      .upsert(rows, { onConflict: "book_id,member_id" });
+    if (scoresError) throw new Error(scoresError.message);
+  }
+
+  revalidatePath("/");
 }

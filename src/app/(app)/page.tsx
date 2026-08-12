@@ -1,26 +1,86 @@
 import { lockBook, saveScores } from "@/lib/actions";
-import { getActiveMembers, getClubSettings, getCurrentBook, getMemberMap, getScoresForBook } from "@/lib/data";
+import {
+  getActiveMembers,
+  getClubSettings,
+  getCurrentBook,
+  getMemberMap,
+  getPastBooks,
+  getScoresForBook,
+  getScoresForBooks,
+} from "@/lib/data";
 import { average, formatDate, todayIsoDate } from "@/lib/util";
 import { BookCover } from "@/components/BookCover";
 import { StartBookForm } from "@/components/StartBookForm";
+import { PastBooksList, type PastBookView } from "@/components/PastBooksList";
 
-export default async function CurrentBookPage() {
-  const [book, settings, activeMembers, memberMap] = await Promise.all([
+export default async function HomePage() {
+  const [book, settings, activeMembers, memberMap, pastBooks] = await Promise.all([
     getCurrentBook(),
     getClubSettings(),
     getActiveMembers(),
     getMemberMap(),
+    getPastBooks(),
   ]);
 
-  if (!book) {
-    return (
-      <div className="space-y-4">
-        <h1 className="text-xl font-semibold">Start the next book</h1>
-        <StartBookForm members={activeMembers} />
-      </div>
-    );
-  }
+  const pastScores = await getScoresForBooks(pastBooks.map((b) => b.id));
+  const pastBookViews: PastBookView[] = pastBooks.map((b) => {
+    const bookScores = pastScores.filter((s) => s.book_id === b.id);
+    return {
+      id: b.id,
+      title: b.title,
+      author: b.author,
+      coverUrl: b.cover_url,
+      pickerName: memberMap.get(b.picker_id)?.name ?? "Unknown",
+      dateDiscussed: b.date_discussed,
+      dateDiscussedLabel: formatDate(b.date_discussed),
+      average: average(
+        bookScores.filter((s) => !s.absent && s.score !== null).map((s) => s.score!),
+      ),
+      scores: bookScores.map((s) => ({
+        memberName: memberMap.get(s.member_id)?.name ?? "Unknown",
+        score: s.score,
+        absent: s.absent,
+      })),
+    };
+  });
 
+  return (
+    <div className="space-y-10">
+      <section>
+        {!book ? (
+          <div className="space-y-4">
+            <h1 className="text-xl font-semibold">Start the next book</h1>
+            <StartBookForm members={activeMembers} />
+          </div>
+        ) : (
+          <CurrentBook
+            book={book}
+            settings={settings}
+            activeMembers={activeMembers}
+            memberMap={memberMap}
+          />
+        )}
+      </section>
+
+      <section className="space-y-4 border-t border-neutral-200 pt-8 dark:border-neutral-800">
+        <h2 className="text-xl font-semibold">Past Books</h2>
+        <PastBooksList books={pastBookViews} />
+      </section>
+    </div>
+  );
+}
+
+async function CurrentBook({
+  book,
+  settings,
+  activeMembers,
+  memberMap,
+}: {
+  book: NonNullable<Awaited<ReturnType<typeof getCurrentBook>>>;
+  settings: Awaited<ReturnType<typeof getClubSettings>>;
+  activeMembers: Awaited<ReturnType<typeof getActiveMembers>>;
+  memberMap: Awaited<ReturnType<typeof getMemberMap>>;
+}) {
   const scores = await getScoresForBook(book.id);
   const scoreByMember = new Map(scores.map((s) => [s.member_id, s]));
   const avg = average(scores.filter((s) => !s.absent && s.score !== null).map((s) => s.score!));
@@ -39,11 +99,6 @@ export default async function CurrentBookPage() {
           <p className="text-sm text-neutral-500">
             Next meeting: {formatDate(settings.next_meeting_date)}
           </p>
-          {book.description && (
-            <p className="pt-2 text-sm text-neutral-700 dark:text-neutral-300">
-              {book.description}
-            </p>
-          )}
         </div>
       </div>
 

@@ -1,7 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
 export const SESSION_COOKIE_NAME = "bookclub_session";
-export const MEMBER_COOKIE_NAME = "bookclub_member";
 
 const SESSION_PAYLOAD = "authenticated";
 
