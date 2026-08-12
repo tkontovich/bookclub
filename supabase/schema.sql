@@ -53,7 +53,7 @@ create table if not exists scores (
   created_at timestamptz not null default now(),
   unique (book_id, member_id),
   constraint scores_score_or_absent check (
-    (absent and score is null) or (not absent and score is not null and score >= 1 and score <= 10)
+    (absent and score is null) or (not absent and score is not null and score >= 0 and score <= 10)
   )
 );
 

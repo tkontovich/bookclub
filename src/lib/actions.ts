@@ -43,8 +43,8 @@ function buildScoreRows(formData: FormData, members: Member[], bookId: string): 
     let score: number | null = null;
     if (!absent && typeof scoreRaw === "string" && scoreRaw.trim() !== "") {
       const parsed = Math.round(Number(scoreRaw) * 10) / 10;
-      if (!Number.isFinite(parsed) || parsed < 1 || parsed > 10) {
-        throw new Error(`${member.name}'s score must be between 1 and 10.`);
+      if (!Number.isFinite(parsed) || parsed < 0 || parsed > 10) {
+        throw new Error(`${member.name}'s score must be between 0 and 10.`);
       }
       score = parsed;
     }

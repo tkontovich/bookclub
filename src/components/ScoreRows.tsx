@@ -22,7 +22,7 @@ export function ScoreRows({
             <input
               type="number"
               name={`score_${member.id}`}
-              min={1}
+              min={0}
               max={10}
               step={0.1}
               defaultValue={entry?.score ?? ""}
