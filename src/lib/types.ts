@@ -21,33 +21,18 @@ export type Book = {
   created_at: string;
 };
 
-export type Round = {
-  id: string;
-  picker_id: string;
-  status: "open" | "closed";
-  created_at: string;
-};
-
-export type Vote = {
-  id: string;
-  round_id: string;
-  book_id: string;
-  member_id: string;
-  created_at: string;
-};
-
 export type Score = {
   id: string;
   book_id: string;
   member_id: string;
-  score: number;
+  score: number | null;
+  absent: boolean;
   created_at: string;
 };
 
 export type ClubSettings = {
   id: boolean;
   next_meeting_date: string | null;
-  next_picker_id: string | null;
 };
 
 export type BookSearchResult = {

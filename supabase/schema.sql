@@ -11,6 +11,8 @@ create table if not exists members (
   created_at timestamptz not null default now()
 );
 
+-- Voting is on hold for now (books are set as the current read directly),
+-- but these two tables are kept around in case it comes back later.
 create table if not exists rounds (
   id uuid primary key default gen_random_uuid(),
   picker_id uuid not null references members (id),
@@ -46,16 +48,19 @@ create table if not exists scores (
   id uuid primary key default gen_random_uuid(),
   book_id uuid not null references books (id) on delete cascade,
   member_id uuid not null references members (id),
-  score numeric(4, 1) not null check (score >= 1 and score <= 10),
+  score numeric(4, 1),
+  absent boolean not null default false,
   created_at timestamptz not null default now(),
-  unique (book_id, member_id)
+  unique (book_id, member_id),
+  constraint scores_score_or_absent check (
+    (absent and score is null) or (not absent and score is not null and score >= 1 and score <= 10)
+  )
 );
 
 -- Singleton row (id must be `true`, so only one row can ever exist).
 create table if not exists club_settings (
   id boolean primary key default true check (id),
-  next_meeting_date date,
-  next_picker_id uuid references members (id)
+  next_meeting_date date
 );
 
 insert into club_settings (id)

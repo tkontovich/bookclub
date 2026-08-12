@@ -6,7 +6,6 @@ import { MemberSwitcher } from "./MemberSwitcher";
 
 const links = [
   { href: "/", label: "Current" },
-  { href: "/vote", label: "Vote" },
   { href: "/past", label: "Past Books" },
   { href: "/settings", label: "Settings" },
 ];

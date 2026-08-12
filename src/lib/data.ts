@@ -1,5 +1,5 @@
 import { getSupabase } from "./supabase";
-import type { Book, ClubSettings, Member, Round, Score, Vote } from "./types";
+import type { Book, ClubSettings, Member, Score } from "./types";
 
 // Plain, unjoined queries - names are resolved in the UI layer via
 // getMemberMap() rather than relying on PostgREST embedding. With only a
@@ -61,30 +61,4 @@ export async function getScoresForBooks(bookIds: string[]): Promise<Score[]> {
 
 export async function getScoresForBook(bookId: string): Promise<Score[]> {
   return getScoresForBooks([bookId]);
-}
-
-export async function getOpenRound(): Promise<Round | null> {
-  const { data, error } = await getSupabase()
-    .from("rounds")
-    .select("*")
-    .eq("status", "open")
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  return data;
-}
-
-export async function getBooksForRound(roundId: string): Promise<Book[]> {
-  const { data, error } = await getSupabase()
-    .from("books")
-    .select("*")
-    .eq("round_id", roundId)
-    .order("created_at", { ascending: true });
-  if (error) throw new Error(error.message);
-  return data ?? [];
-}
-
-export async function getVotesForRound(roundId: string): Promise<Vote[]> {
-  const { data, error } = await getSupabase().from("votes").select("*").eq("round_id", roundId);
-  if (error) throw new Error(error.message);
-  return data ?? [];
 }

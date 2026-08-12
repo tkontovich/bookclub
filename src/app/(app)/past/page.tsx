@@ -16,7 +16,9 @@ export default async function PastBooksPage() {
       <ul className="space-y-4">
         {books.map((book) => {
           const bookScores = scores.filter((s) => s.book_id === book.id);
-          const avg = average(bookScores.map((s) => s.score));
+          const avg = average(
+            bookScores.filter((s) => !s.absent && s.score !== null).map((s) => s.score!),
+          );
           const picker = memberMap.get(book.picker_id);
 
           return (
@@ -48,7 +50,9 @@ export default async function PastBooksPage() {
                       {bookScores.map((s) => (
                         <li key={s.id} className="flex justify-between">
                           <span>{memberMap.get(s.member_id)?.name ?? "Unknown"}</span>
-                          <span className="tabular-nums">{s.score.toFixed(1)}</span>
+                          <span className="tabular-nums">
+                            {s.absent ? "Absent" : s.score!.toFixed(1)}
+                          </span>
                         </li>
                       ))}
                     </ul>
