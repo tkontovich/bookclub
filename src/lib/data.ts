@@ -62,3 +62,13 @@ export async function getScoresForBooks(bookIds: string[]): Promise<Score[]> {
 export async function getScoresForBook(bookId: string): Promise<Score[]> {
   return getScoresForBooks([bookId]);
 }
+
+/** Every book regardless of status - used for whole-club analytics. */
+export async function getAllBooks(): Promise<Book[]> {
+  const { data, error } = await getSupabase()
+    .from("books")
+    .select("*")
+    .order("date_discussed", { ascending: false, nullsFirst: false });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}

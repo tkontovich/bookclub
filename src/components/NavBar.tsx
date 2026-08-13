@@ -19,6 +19,29 @@ export async function NavBar() {
         <div className="flex items-center gap-3">
           <EditToggle unlocked={unlocked} />
           <Link
+            href="/analytics"
+            aria-label="Analytics"
+            title="Analytics"
+            className="text-term-dim hover:text-term-bright"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="22"
+              height="22"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3.5 20.5h17" />
+              <path d="M7 20.5v-6" />
+              <path d="M12 20.5V5.5" />
+              <path d="M17 20.5v-9.5" />
+            </svg>
+          </Link>
+          <Link
             href="/settings"
             aria-label="Settings"
             title="Settings"
