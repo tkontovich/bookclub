@@ -309,8 +309,12 @@ dialog::backdrop {
 }
 
 /* Book covers get an amber duotone so they sit on the phosphor screen,
-   and snap back to their true colors on hover. */
+   and snap back to their true colors on hover. They also sit above the
+   scanline overlay (z-index 100) so the artwork stays clean - modals are
+   unaffected because <dialog> renders in the top layer regardless. */
 .cover {
+  position: relative;
+  z-index: 101;
   filter: sepia(0.5) hue-rotate(-12deg) saturate(1.5) brightness(0.92);
   transition: filter 200ms;
 }
