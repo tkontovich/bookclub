@@ -72,7 +72,18 @@ create index if not exists books_round_id_idx on books (round_id);
 create index if not exists votes_round_id_idx on votes (round_id);
 create index if not exists scores_book_id_idx on scores (book_id);
 
--- This app connects with the Supabase service role key from trusted server
--- code only (never from the browser), so Row Level Security is left off.
--- If you ever add a client-side Supabase connection, enable RLS on every
--- table above first.
+-- Row Level Security is on for every table, with no policies, which denies
+-- the anon and authenticated roles outright. These tables sit in the
+-- `public` schema and are therefore reachable through PostgREST by anyone
+-- holding the project's anon key, which is publishable by design.
+--
+-- The app only queries from server code using the service role key, and the
+-- service role bypasses RLS, so no policies are required. If you ever add a
+-- client-side Supabase connection, write explicit policies for it rather
+-- than turning RLS back off.
+alter table members enable row level security;
+alter table books enable row level security;
+alter table scores enable row level security;
+alter table club_settings enable row level security;
+alter table rounds enable row level security;
+alter table votes enable row level security;
