@@ -5,10 +5,10 @@ import {
   getCurrentBook,
   getMemberMap,
   getPastBooks,
-  getScoresForBook,
   getScoresForBooks,
 } from "@/lib/data";
 import { isUnlocked } from "@/lib/session";
+import type { Score } from "@/lib/types";
 import { average, formatDate } from "@/lib/util";
 import { BookCover } from "@/components/BookCover";
 import { StartBookForm } from "@/components/StartBookForm";
@@ -25,7 +25,14 @@ export default async function HomePage() {
     isUnlocked(),
   ]);
 
-  const pastScores = await getScoresForBooks(pastBooks.map((b) => b.id));
+  // One round trip for every score on the page - the current book's and the
+  // archive's - rather than a second query nested inside CurrentBook.
+  const allScores = await getScoresForBooks([
+    ...(book ? [book.id] : []),
+    ...pastBooks.map((b) => b.id),
+  ]);
+  const pastScores = allScores.filter((s) => s.book_id !== book?.id);
+  const currentScores = book ? allScores.filter((s) => s.book_id === book.id) : [];
   const pastBookViews: PastBookView[] = pastBooks.map((b) => {
     const bookScores = pastScores.filter((s) => s.book_id === b.id);
     return {
@@ -70,6 +77,7 @@ export default async function HomePage() {
               activeMembers={activeMembers}
               memberMap={memberMap}
               canEdit={canEdit}
+              scores={currentScores}
             />
           )}
         </div>
@@ -102,20 +110,21 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-async function CurrentBook({
+function CurrentBook({
   book,
   settings,
   activeMembers,
   memberMap,
   canEdit,
+  scores,
 }: {
   book: NonNullable<Awaited<ReturnType<typeof getCurrentBook>>>;
   settings: Awaited<ReturnType<typeof getClubSettings>>;
   activeMembers: Awaited<ReturnType<typeof getActiveMembers>>;
   memberMap: Awaited<ReturnType<typeof getMemberMap>>;
   canEdit: boolean;
+  scores: Score[];
 }) {
-  const scores = await getScoresForBook(book.id);
   const scoreByMember = new Map(scores.map((s) => [s.member_id, s]));
   const avg = average(scores.filter((s) => !s.absent && s.score !== null).map((s) => s.score!));
   const picker = memberMap.get(book.picker_id);
