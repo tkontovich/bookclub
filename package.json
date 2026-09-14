@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "backup": "node --env-file-if-exists=.env.local scripts/backup.mjs",
+    "restore": "node --env-file-if-exists=.env.local scripts/restore.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
