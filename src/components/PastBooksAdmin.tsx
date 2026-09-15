@@ -8,7 +8,6 @@ import { BookSearchFields } from "./BookSearchFields";
 import { DatePicker } from "./DatePicker";
 import { ScoreRows, type ScoreEntry } from "./ScoreRows";
 import { Modal } from "./Modal";
-import { InviteMoveNote } from "./mock/CalendarMock";
 
 export type BookAdminView = {
   id: string;
@@ -27,10 +26,13 @@ export function PastBooksAdmin({
   books,
   members,
   canEdit,
+  inviteSent = false,
 }: {
   books: BookAdminView[];
   members: Member[];
   canEdit: boolean;
+  /** Whether the current book already has a calendar invite out. */
+  inviteSent?: boolean;
 }) {
   // `null` = closed, `"new"` = add modal, otherwise the book being edited.
   const [target, setTarget] = useState<BookAdminView | "new" | null>(null);
@@ -90,6 +92,7 @@ export function PastBooksAdmin({
             key={target === "new" ? "new" : target.id}
             members={members}
             book={target === "new" ? null : target}
+            inviteSent={inviteSent}
             onDone={() => setTarget(null)}
           />
         )}
@@ -101,10 +104,12 @@ export function PastBooksAdmin({
 function BookForm({
   members,
   book,
+  inviteSent,
   onDone,
 }: {
   members: Member[];
   book: BookAdminView | null;
+  inviteSent: boolean;
   onDone: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
@@ -152,7 +157,11 @@ function BookForm({
         <div className="space-y-1.5">
           <span className="label block">{isCurrent ? "Next meeting" : "Discussed on"}</span>
           <DatePicker name="bookDate" defaultValue={book?.date ?? ""} required={!isCurrent} />
-          {isCurrent && <InviteMoveNote />}
+          {isCurrent && inviteSent && (
+            <p className="text-xs text-term-dim">
+              Changing the date moves the existing invite, and Google emails everyone the update.
+            </p>
+          )}
         </div>
       </BookSearchFields>
 

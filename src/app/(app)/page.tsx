@@ -1,39 +1,44 @@
 import { lockBook, saveScores } from "@/lib/actions";
 import {
   getActiveMembers,
+  getCalendarInvite,
   getClubSettings,
   getCurrentBook,
+  getGoogleCredentials,
   getMemberMap,
   getPastBooks,
   getScoresForBooks,
 } from "@/lib/data";
 import { isUnlocked } from "@/lib/session";
-import type { Score } from "@/lib/types";
-import { average, formatDate } from "@/lib/util";
+import type { CalendarInvite, Score } from "@/lib/types";
+import { average, formatDate, formatTimeOfDay } from "@/lib/util";
 import { BookCover } from "@/components/BookCover";
 import { StartBookForm } from "@/components/StartBookForm";
 import { PastBooksList, type PastBookView } from "@/components/PastBooksList";
 import { ScoreRows, type ScoreEntry } from "@/components/ScoreRows";
-import { InviteStatusRow, MeetingTime } from "@/components/mock/CalendarMock";
+import { InviteLine } from "@/components/CalendarSettings";
 
 export default async function HomePage() {
-  const [book, settings, activeMembers, memberMap, pastBooks, canEdit] = await Promise.all([
-    getCurrentBook(),
-    getClubSettings(),
-    getActiveMembers(),
-    getMemberMap(),
-    getPastBooks(),
-    isUnlocked(),
-  ]);
+  const [book, settings, activeMembers, memberMap, pastBooks, canEdit, credentials] =
+    await Promise.all([
+      getCurrentBook(),
+      getClubSettings(),
+      getActiveMembers(),
+      getMemberMap(),
+      getPastBooks(),
+      isUnlocked(),
+      getGoogleCredentials(),
+    ]);
 
   // One round trip for every score on the page - the current book's and the
   // archive's - rather than a second query nested inside CurrentBook.
-  const allScores = await getScoresForBooks([
-    ...(book ? [book.id] : []),
-    ...pastBooks.map((b) => b.id),
+  const [allScores, invite] = await Promise.all([
+    getScoresForBooks([...(book ? [book.id] : []), ...pastBooks.map((b) => b.id)]),
+    book ? getCalendarInvite(book.id) : Promise.resolve(null),
   ]);
   const pastScores = allScores.filter((s) => s.book_id !== book?.id);
   const currentScores = book ? allScores.filter((s) => s.book_id === book.id) : [];
+  const invitableCount = activeMembers.filter((m) => m.email && m.email.trim() !== "").length;
   const pastBookViews: PastBookView[] = pastBooks.map((b) => {
     const bookScores = pastScores.filter((s) => s.book_id === b.id);
     return {
@@ -64,7 +69,11 @@ export default async function HomePage() {
             <>
               <SectionHeading>Start the next book</SectionHeading>
               {canEdit ? (
-                <StartBookForm members={activeMembers} />
+                <StartBookForm
+                  members={activeMembers}
+                  googleConnected={credentials !== null}
+                  invitableCount={invitableCount}
+                />
               ) : (
                 <p className="label">
                   Nothing being read right now. Switch edit mode on to pick the next book.
@@ -79,6 +88,7 @@ export default async function HomePage() {
               memberMap={memberMap}
               canEdit={canEdit}
               scores={currentScores}
+              invite={invite}
             />
           )}
         </div>
@@ -118,6 +128,7 @@ function CurrentBook({
   memberMap,
   canEdit,
   scores,
+  invite,
 }: {
   book: NonNullable<Awaited<ReturnType<typeof getCurrentBook>>>;
   settings: Awaited<ReturnType<typeof getClubSettings>>;
@@ -125,6 +136,7 @@ function CurrentBook({
   memberMap: Awaited<ReturnType<typeof getMemberMap>>;
   canEdit: boolean;
   scores: Score[];
+  invite: CalendarInvite | null;
 }) {
   const scoreByMember = new Map(scores.map((s) => [s.member_id, s]));
   const avg = average(scores.filter((s) => !s.absent && s.score !== null).map((s) => s.score!));
@@ -153,7 +165,12 @@ function CurrentBook({
                 value={
                   <>
                     {formatDate(settings.next_meeting_date)}
-                    {settings.next_meeting_date && <MeetingTime />}
+                    {settings.next_meeting_date && (
+                      <span className="text-term-dim">
+                        {" "}
+                        · {formatTimeOfDay(settings.meeting_start_time)} PT
+                      </span>
+                    )}
                   </>
                 }
               />
@@ -221,9 +238,8 @@ function CurrentBook({
           </div>
         </details>
 
-        {canEdit && (
-          <InviteStatusRow members={activeMembers.map((m) => ({ id: m.id, name: m.name }))} />
-        )}
+        {/* Invite state is an organiser detail, so it stays behind edit mode. */}
+        {canEdit && <InviteLine invite={invite} />}
 
         {canEdit && (
           <div className="flex flex-wrap items-center gap-3 border-t border-term-fg/25 px-5 py-3">

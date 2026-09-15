@@ -1,6 +1,8 @@
 export type Member = {
   id: string;
   name: string;
+  /** Only used for calendar invites; never rendered publicly. */
+  email: string | null;
   active: boolean;
   created_at: string;
 };
@@ -32,6 +34,33 @@ export type Score = {
 export type ClubSettings = {
   id: boolean;
   next_meeting_date: string | null;
+  /** Postgres `time`, e.g. "19:00:00". */
+  meeting_start_time: string;
+  meeting_duration_minutes: number;
+  /** IANA zone, e.g. "America/Los_Angeles". */
+  meeting_timezone: string;
+};
+
+/** Singleton row holding the club's Google connection. */
+export type GoogleCredentials = {
+  id: boolean;
+  refresh_token: string;
+  connected_email: string | null;
+  calendar_id: string;
+  updated_at: string;
+};
+
+export type InviteStatus = "pending" | "sent" | "failed";
+
+export type CalendarInvite = {
+  book_id: string;
+  google_event_id: string | null;
+  meet_url: string | null;
+  status: InviteStatus;
+  error: string | null;
+  recipient_count: number;
+  sent_at: string | null;
+  created_at: string;
 };
 
 export type BookSearchResult = {

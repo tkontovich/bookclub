@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { getSupabase } from "./supabase";
-import type { Book, ClubSettings, Member, Score } from "./types";
+import type { Book, CalendarInvite, ClubSettings, GoogleCredentials, Member, Score } from "./types";
 
 // Plain, unjoined queries - names are resolved in the UI layer via
 // getMemberMap() rather than relying on PostgREST embedding. With only a
@@ -68,6 +68,40 @@ export const getAllBooks = cache(async (): Promise<Book[]> => {
   if (error) throw new Error(error.message);
   return data ?? [];
 });
+
+/** Members who can actually be invited - active, with an email on file. */
+export async function getInvitableMembers(): Promise<Member[]> {
+  const members = await getAllMembers();
+  return members.filter((m) => m.active && m.email && m.email.trim() !== "");
+}
+
+/** The club's Google connection, or null when nothing is connected. */
+export const getGoogleCredentials = cache(async (): Promise<GoogleCredentials | null> => {
+  const { data, error } = await getSupabase()
+    .from("google_credentials")
+    .select("*")
+    .eq("id", true)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data;
+});
+
+/** Whether a Google account is connected, without exposing the token. */
+export async function isGoogleConnected(): Promise<boolean> {
+  return (await getGoogleCredentials()) !== null;
+}
+
+export const getCalendarInvite = cache(
+  async (bookId: string): Promise<CalendarInvite | null> => {
+    const { data, error } = await getSupabase()
+      .from("calendar_invites")
+      .select("*")
+      .eq("book_id", bookId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data;
+  },
+);
 
 // Not memoised: the array argument is a fresh reference on every call, so
 // cache() could never hit. Callers should fetch one batch and split it.

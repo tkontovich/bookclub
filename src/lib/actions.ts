@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import { getSupabase } from "./supabase";
 import { getActiveMembers, getAllMembers, getClubSettings, getCurrentBook } from "./data";
 import { searchForBooks } from "./book-search";
+import { clearCredentials, forgetAccessToken, loadCredentials, revokeToken } from "./google";
+import { syncInvite, syncInviteIfSent } from "./invites";
 import { SESSION_COOKIE_NAME, isUnlocked } from "./session";
 import { todayIsoDate } from "./util";
 import type { BookSearchResult, Member } from "./types";
@@ -40,6 +42,16 @@ function nonEmpty(formData: FormData, field: string): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+function validEmail(value: string | null): string | null {
+  if (!value) return null;
+  // Deliberately loose: Google does the real validation, and a wrong-looking
+  // address should fail loudly there rather than be silently dropped here.
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+    throw new Error(`"${value}" doesn't look like an email address.`);
+  }
+  return value;
+}
+
 type ScoreRow = { book_id: string; member_id: string; absent: boolean; score: number | null };
 
 function buildScoreRows(formData: FormData, members: Member[], bookId: string): ScoreRow[] {
@@ -58,14 +70,15 @@ function buildScoreRows(formData: FormData, members: Member[], bookId: string): 
   });
 }
 
-// --- Members / settings -----------------------------------------------------
+// --- Members ----------------------------------------------------------------
 
 export async function addMember(formData: FormData): Promise<void> {
   await requireUnlocked();
   const name = nonEmpty(formData, "name");
   if (!name) throw new Error("Name is required.");
+  const email = validEmail(nonEmpty(formData, "email"));
 
-  const { error } = await getSupabase().from("members").insert({ name });
+  const { error } = await getSupabase().from("members").insert({ name, email });
   if (error) {
     if (error.code === "23505") {
       throw new Error(`"${name}" is already a member.`);
@@ -73,6 +86,32 @@ export async function addMember(formData: FormData): Promise<void> {
     throw new Error(error.message);
   }
   revalidatePath("/settings");
+  revalidatePath("/");
+}
+
+/**
+ * Member changes don't touch the calendar. Google emails every attendee on
+ * any event change, so syncing here would mail the whole club each time an
+ * address is corrected - resending is an explicit choice instead.
+ */
+export async function updateMember(formData: FormData): Promise<void> {
+  await requireUnlocked();
+  const memberId = nonEmpty(formData, "memberId");
+  if (!memberId) throw new Error("Missing member.");
+  const name = nonEmpty(formData, "name");
+  if (!name) throw new Error("Name is required.");
+  const email = validEmail(nonEmpty(formData, "email"));
+
+  const { error } = await getSupabase()
+    .from("members")
+    .update({ name, email })
+    .eq("id", memberId);
+  if (error) {
+    if (error.code === "23505") throw new Error(`"${name}" is already a member.`);
+    throw new Error(error.message);
+  }
+  revalidatePath("/settings");
+  revalidatePath("/");
 }
 
 export async function removeMember(formData: FormData): Promise<void> {
@@ -82,6 +121,63 @@ export async function removeMember(formData: FormData): Promise<void> {
 
   const { error } = await getSupabase().from("members").update({ active: false }).eq("id", memberId);
   if (error) throw new Error(error.message);
+  revalidatePath("/settings");
+  revalidatePath("/");
+}
+
+// --- Google calendar --------------------------------------------------------
+
+/** Drops the stored token and tells Google to forget the grant too. */
+export async function disconnectGoogle(): Promise<void> {
+  await requireUnlocked();
+  const credentials = await loadCredentials();
+  if (credentials) {
+    forgetAccessToken(credentials.refresh_token);
+    await revokeToken(credentials.refresh_token);
+    await clearCredentials();
+  }
+  revalidatePath("/settings");
+  revalidatePath("/");
+}
+
+const ALLOWED_DURATIONS = [60, 90, 120, 150, 180];
+
+export async function saveMeetingSettings(formData: FormData): Promise<void> {
+  await requireUnlocked();
+  const startTime = nonEmpty(formData, "startTime");
+  if (!startTime || !/^\d{2}:\d{2}(:\d{2})?$/.test(startTime)) {
+    throw new Error("Pick a start time.");
+  }
+  const duration = Number(formData.get("durationMinutes"));
+  if (!ALLOWED_DURATIONS.includes(duration)) throw new Error("Pick a meeting length.");
+
+  const { error } = await getSupabase()
+    .from("club_settings")
+    .update({
+      meeting_start_time: startTime.length === 5 ? `${startTime}:00` : startTime,
+      meeting_duration_minutes: duration,
+    })
+    .eq("id", true);
+  if (error) throw new Error(error.message);
+
+  // An invite that's already out should move to the new time.
+  const currentBook = await getCurrentBook();
+  if (currentBook) await syncInviteIfSent(currentBook.id);
+
+  revalidatePath("/settings");
+  revalidatePath("/");
+}
+
+/** Sends the invite, or re-sends it to everyone on the current list. */
+export async function sendInvite(formData: FormData): Promise<void> {
+  await requireUnlocked();
+  const bookId = nonEmpty(formData, "bookId");
+  if (!bookId) throw new Error("Missing book.");
+
+  // The outcome is recorded on calendar_invites, which is what the UI reads,
+  // so a Google failure surfaces as a status rather than an error page.
+  await syncInvite(bookId);
+
   revalidatePath("/settings");
   revalidatePath("/");
 }
@@ -106,15 +202,19 @@ export async function startCurrentBook(formData: FormData): Promise<void> {
   const pickerId = nonEmpty(formData, "pickerId");
   if (!pickerId) throw new Error("Choose who picked this book.");
 
-  const { error } = await getSupabase().from("books").insert({
-    title,
-    author: nonEmpty(formData, "author"),
-    cover_url: nonEmpty(formData, "coverUrl"),
-    google_books_id: nonEmpty(formData, "googleBooksId"),
-    picker_id: pickerId,
-    status: "current",
-  });
-  if (error) throw new Error(error.message);
+  const { data: book, error } = await getSupabase()
+    .from("books")
+    .insert({
+      title,
+      author: nonEmpty(formData, "author"),
+      cover_url: nonEmpty(formData, "coverUrl"),
+      google_books_id: nonEmpty(formData, "googleBooksId"),
+      picker_id: pickerId,
+      status: "current",
+    })
+    .select("id")
+    .single();
+  if (error || !book) throw new Error(error?.message ?? "Could not start that book.");
 
   // The meeting date is set alongside the book rather than in settings; it
   // later seeds the "discussed on" date when the book gets archived.
@@ -124,7 +224,12 @@ export async function startCurrentBook(formData: FormData): Promise<void> {
     .eq("id", true);
   if (settingsError) throw new Error(settingsError.message);
 
+  // Failures are recorded against the book and retried from settings; the
+  // book and its date are already saved either way.
+  if (formData.get("sendInvite") === "on") await syncInvite(book.id);
+
   revalidatePath("/");
+  revalidatePath("/settings");
 }
 
 export async function saveScores(formData: FormData): Promise<void> {
@@ -147,6 +252,11 @@ export async function saveScores(formData: FormData): Promise<void> {
   revalidatePath("/");
 }
 
+/**
+ * Archives the book once it's been discussed. The calendar event is left
+ * alone: that meeting has already happened, and deleting it would mail
+ * everyone a cancellation for something they attended.
+ */
 export async function lockBook(formData: FormData): Promise<void> {
   await requireUnlocked();
   const bookId = nonEmpty(formData, "bookId");
@@ -278,6 +388,10 @@ export async function updateBook(formData: FormData): Promise<void> {
     const { error: insertError } = await getSupabase().from("scores").insert(rows);
     if (insertError) throw new Error(insertError.message);
   }
+
+  // A date change on the current book moves the meeting, and Google mails
+  // everyone the update - but only if an invite already went out.
+  if (isCurrent) await syncInviteIfSent(bookId);
 
   revalidatePath("/");
   revalidatePath("/settings");
