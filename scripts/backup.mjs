@@ -8,7 +8,7 @@
 // restorable snapshot; see scripts/restore.mjs.
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { TABLES, fetchTable, requireEnv } from "./backup-tables.mjs";
+import { TABLES, fetchTable, requireEnv, stripOmitted } from "./backup-tables.mjs";
 
 const url = requireEnv("SUPABASE_URL").replace(/\/+$/, "");
 const key = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
@@ -28,8 +28,9 @@ await mkdir(outDir, { recursive: true });
 // Fetch everything before writing anything, so a failure part-way through
 // can't leave a half-updated snapshot on disk.
 const exports = [];
-for (const { name } of TABLES) {
-  const rows = await fetchTable(url, key, name);
+for (const { name, omit } of TABLES) {
+  // Emails are stripped here, before anything reaches disk or the repo.
+  const rows = (await fetchTable(url, key, name)).map((row) => stripOmitted(row, omit));
   const file = path.join(outDir, `${name}.json`);
   const before = await previousCount(file);
 

@@ -8,8 +8,13 @@
 // their primary key. scores and votes use their natural unique key instead,
 // because a score that was deleted and re-entered gets a new id - matching
 // on id would then collide with the unique (book_id, member_id) constraint.
+//
+// `omit` lists columns that must never be written to the backup files. The
+// repo is public, and first names and ratings are fine there, but members'
+// email addresses are not. They stay in the database only; a restore leaves
+// whatever address is already live untouched.
 export const TABLES = [
-  { name: "members", match: ["id"] },
+  { name: "members", match: ["id"], omit: ["email"] },
   { name: "rounds", match: ["id"] },
   { name: "books", match: ["id"] },
   { name: "votes", match: ["round_id", "member_id"] },
@@ -31,6 +36,14 @@ export function requireEnv(name) {
 
 export function supabaseHeaders(key) {
   return { apikey: key, Authorization: `Bearer ${key}` };
+}
+
+/** Drops the columns a table keeps out of the public backup. */
+export function stripOmitted(row, omit) {
+  if (!omit || omit.length === 0) return { ...row };
+  const copy = { ...row };
+  for (const column of omit) delete copy[column];
+  return copy;
 }
 
 const PAGE_SIZE = 1000;
