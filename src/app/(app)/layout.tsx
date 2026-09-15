@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
 
 // Every page here reads the session cookie and hits Supabase, so there's
@@ -14,9 +15,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Full width so sections can run edge to edge; each page constrains
           its own content to max-w-3xl. */}
       <main className="w-full flex-1">{children}</main>
-      <footer className="mx-auto w-full max-w-3xl p-4">
+      <footer className="mx-auto w-full max-w-3xl space-y-2 p-4">
         <p className="rule">
           {"//"} LATER, NERDS {"-".repeat(120)}
+        </p>
+        {/* Google requires the privacy policy to be linked from the homepage
+            of an app that uses Google sign-in. */}
+        <p className="label flex gap-4">
+          <Link href="/privacy" className="hover:text-term-fg">
+            Privacy
+          </Link>
+          <Link href="/terms" className="hover:text-term-fg">
+            Terms
+          </Link>
         </p>
       </footer>
     </>
