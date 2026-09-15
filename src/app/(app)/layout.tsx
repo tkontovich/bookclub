@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { NavBar } from "@/components/NavBar";
+import { MockSwitcher } from "@/components/mock/MockSwitcher";
 
 // Every page here reads the session cookie and hits Supabase, so there's
 // nothing worth prerendering - this also skips Next's speculative
@@ -30,6 +31,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </Link>
         </p>
       </footer>
+      <MockSwitcher />
     </>
   );
 }

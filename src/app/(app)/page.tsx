@@ -14,6 +14,7 @@ import { BookCover } from "@/components/BookCover";
 import { StartBookForm } from "@/components/StartBookForm";
 import { PastBooksList, type PastBookView } from "@/components/PastBooksList";
 import { ScoreRows, type ScoreEntry } from "@/components/ScoreRows";
+import { InviteStatusRow, MeetingTime } from "@/components/mock/CalendarMock";
 
 export default async function HomePage() {
   const [book, settings, activeMembers, memberMap, pastBooks, canEdit] = await Promise.all([
@@ -147,7 +148,15 @@ function CurrentBook({
             <div className="space-y-1.5">
               {book.author && <Row label="Author" value={book.author} />}
               <Row label="Picked by" value={picker?.name ?? "Unknown"} />
-              <Row label="Next meeting" value={formatDate(settings.next_meeting_date)} />
+              <Row
+                label="Next meeting"
+                value={
+                  <>
+                    {formatDate(settings.next_meeting_date)}
+                    {settings.next_meeting_date && <MeetingTime />}
+                  </>
+                }
+              />
               <Row
                 label="Average"
                 value={
@@ -211,6 +220,10 @@ function CurrentBook({
             )}
           </div>
         </details>
+
+        {canEdit && (
+          <InviteStatusRow members={activeMembers.map((m) => ({ id: m.id, name: m.name }))} />
+        )}
 
         {canEdit && (
           <div className="flex flex-wrap items-center gap-3 border-t border-term-fg/25 px-5 py-3">

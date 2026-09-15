@@ -130,6 +130,37 @@ input[type="checkbox"] {
   accent-color: #ffa93c;
 }
 
+/* Email fields, and the DatePicker trigger, share the text input look. */
+input[type="email"],
+.date-trigger {
+  background-color: rgba(255, 169, 60, 0.06);
+  border: 1px solid rgba(255, 169, 60, 0.3);
+  border-radius: 0;
+  color: #ffd9a0;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  padding: 0.375rem 0.5rem;
+}
+
+input[type="email"] {
+  cursor: text;
+}
+
+input[type="email"]:focus,
+.date-trigger:focus-visible,
+.date-trigger[aria-expanded="true"] {
+  outline: none;
+  border-color: #ffa93c;
+  box-shadow: 0 0 0 1px rgba(255, 169, 60, 0.6), 0 0 14px rgba(255, 169, 60, 0.25);
+}
+
+/* DatePicker's calendar popover. */
+.date-pop {
+  background-color: #100a03;
+  border: 1px solid rgba(255, 169, 60, 0.45);
+  box-shadow: 0 0 30px rgba(255, 169, 60, 0.18);
+}
+
 /* --- Reusable pieces ---------------------------------------------------- */
 
 /* Bordered readout panel with a faint inner screen wash. */
@@ -335,5 +366,29 @@ dialog::backdrop {
 
   .beagle-run {
     display: none;
+  }
+
+  .nav-reveal {
+    animation: none;
+  }
+}
+
+/* Settings gear slides into the nav when edit mode is unlocked. The
+   negative margin cancels the flex gap while it's still zero-width. */
+.nav-reveal {
+  overflow: hidden;
+  animation: nav-reveal 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes nav-reveal {
+  from {
+    max-width: 0;
+    margin-left: -0.75rem;
+    opacity: 0;
+  }
+  to {
+    max-width: 22px;
+    margin-left: 0;
+    opacity: 1;
   }
 }
