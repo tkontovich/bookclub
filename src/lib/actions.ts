@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { getSupabase } from "./supabase";
 import { getActiveMembers, getAllMembers, getClubSettings, getCurrentBook } from "./data";
 import { searchForBooks } from "./book-search";
@@ -21,10 +22,15 @@ async function requireUnlocked(): Promise<void> {
 }
 
 /** Turns edit mode off. Clearing the cookie re-renders the current page. */
-export async function lockSite(): Promise<void> {
+export async function lockSite(formData: FormData): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE_NAME);
   revalidatePath("/", "layout");
+
+  // Settings is edit-only, so re-rendering it would just bounce to the
+  // password screen. Send people home instead.
+  const from = formData.get("from");
+  if (typeof from === "string" && from.startsWith("/settings")) redirect("/");
 }
 
 function nonEmpty(formData: FormData, field: string): string | null {

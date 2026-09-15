@@ -1,4 +1,4 @@
-import { addMember, removeMember } from "@/lib/actions";
+import { redirect } from "next/navigation";
 import {
   getAllMembers,
   getClubSettings,
@@ -9,14 +9,19 @@ import {
 import { PastBooksAdmin, type BookAdminView } from "@/components/PastBooksAdmin";
 import type { ScoreEntry } from "@/components/ScoreRows";
 import { isUnlocked } from "@/lib/session";
+import { CalendarSettingsPanel } from "@/components/mock/CalendarMock";
+import { MembersMock } from "@/components/mock/MembersMock";
 
 export default async function SettingsPage() {
-  const [allMembers, currentBook, pastBooks, settings, canEdit] = await Promise.all([
+  // Settings is edit-only. The nav hides the gear while locked; this catches
+  // anyone who goes to the URL directly.
+  if (!(await isUnlocked())) redirect("/login?returnTo=/settings");
+
+  const [allMembers, currentBook, pastBooks, settings] = await Promise.all([
     getAllMembers(),
     getCurrentBook(),
     getPastBooks(),
     getClubSettings(),
-    isUnlocked(),
   ]);
 
   // The book being read now sits at the top of the same edit list.
@@ -42,6 +47,10 @@ export default async function SettingsPage() {
     };
   });
 
+  const activeMembers = allMembers
+    .filter((m) => m.active)
+    .map((m) => ({ id: m.id, name: m.name }));
+
   return (
     <div className="mx-auto max-w-3xl space-y-8 p-4">
       <h1 className="font-display text-3xl uppercase leading-none text-term-bright">
@@ -50,42 +59,17 @@ export default async function SettingsPage() {
 
       <section className="panel space-y-3 p-5">
         <h2 className="label text-term-fg">Members</h2>
-        <ul className="space-y-1">
-          {allMembers.map((m) => (
-            <li key={m.id} className="flex items-baseline gap-2">
-              <span
-                className={
-                  m.active
-                    ? "shrink-0 text-sm uppercase tracking-wider text-term-bright"
-                    : "shrink-0 text-sm uppercase tracking-wider text-term-dim line-through"
-                }
-              >
-                {m.name}
-              </span>
-              <span className="-translate-y-1 flex-1 border-b border-dotted border-term-fg/30" />
-              {canEdit && m.active && (
-                <form action={removeMember} className="shrink-0">
-                  <input type="hidden" name="memberId" value={m.id} />
-                  <button type="submit" className="label hover:text-term-fg">
-                    [ Remove ]
-                  </button>
-                </form>
-              )}
-            </li>
-          ))}
-        </ul>
-        {canEdit && (
-          <form action={addMember} className="flex flex-wrap items-center gap-2 pt-2">
-            <input type="text" name="name" placeholder="NEW MEMBER NAME" required />
-            <button type="submit" className="btn btn-primary">
-              Add
-            </button>
-          </form>
-        )}
+        <MembersMock members={allMembers} />
       </section>
 
+      <CalendarSettingsPanel
+        members={activeMembers}
+        bookTitle={currentBook?.title ?? null}
+        nextMeetingDate={settings.next_meeting_date}
+      />
+
       <section className="panel space-y-3 p-5">
-        <PastBooksAdmin books={adminBooks} members={allMembers} canEdit={canEdit} />
+        <PastBooksAdmin books={adminBooks} members={allMembers} canEdit />
       </section>
     </div>
   );

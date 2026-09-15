@@ -3,13 +3,25 @@
 import { startCurrentBook } from "@/lib/actions";
 import type { Member } from "@/lib/types";
 import { BookSearchFields } from "./BookSearchFields";
+import { DatePicker } from "./DatePicker";
+import { InviteToggle } from "./mock/CalendarMock";
 
-export function StartBookForm({ members }: { members: Member[] }) {
+export function StartBookForm({
+  members,
+  previewOnly = false,
+}: {
+  members: Member[];
+  /** MOCK: render the form without wiring it to the real action. */
+  previewOnly?: boolean;
+}) {
   return (
-    <form action={startCurrentBook}>
+    <form
+      action={previewOnly ? undefined : startCurrentBook}
+      onSubmit={previewOnly ? (e) => e.preventDefault() : undefined}
+    >
       <BookSearchFields
         footer={
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" disabled={previewOnly} className="btn btn-primary">
             Start this book
           </button>
         }
@@ -28,14 +40,9 @@ export function StartBookForm({ members }: { members: Member[] }) {
           <label htmlFor="nextMeetingDate" className="label block">
             Next meeting
           </label>
-          <input
-            id="nextMeetingDate"
-            type="date"
-            name="nextMeetingDate"
-            required
-            className="w-full"
-          />
+          <DatePicker id="nextMeetingDate" name="nextMeetingDate" required />
         </div>
+        <InviteToggle members={members} />
       </BookSearchFields>
     </form>
   );

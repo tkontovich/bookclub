@@ -5,8 +5,10 @@ import { addPastBook, updateBook } from "@/lib/actions";
 import type { Member } from "@/lib/types";
 import { BookCover } from "./BookCover";
 import { BookSearchFields } from "./BookSearchFields";
+import { DatePicker } from "./DatePicker";
 import { ScoreRows, type ScoreEntry } from "./ScoreRows";
 import { Modal } from "./Modal";
+import { InviteMoveNote } from "./mock/CalendarMock";
 
 export type BookAdminView = {
   id: string;
@@ -149,13 +151,8 @@ function BookForm({
         </select>
         <div className="space-y-1.5">
           <span className="label block">{isCurrent ? "Next meeting" : "Discussed on"}</span>
-          <input
-            type="date"
-            name="bookDate"
-            defaultValue={book?.date ?? ""}
-            required={!isCurrent}
-            className="w-full"
-          />
+          <DatePicker name="bookDate" defaultValue={book?.date ?? ""} required={!isCurrent} />
+          {isCurrent && <InviteMoveNote />}
         </div>
       </BookSearchFields>
 
