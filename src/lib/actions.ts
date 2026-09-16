@@ -7,13 +7,7 @@ import { getSupabase } from "./supabase";
 import { getActiveMembers, getAllMembers, getClubSettings, getCurrentBook } from "./data";
 import { searchForBooks } from "./book-search";
 import { clearCredentials, forgetAccessToken, loadCredentials, revokeToken } from "./google";
-import {
-  deleteTestEvent,
-  sendTestEvent,
-  syncInvite,
-  syncInviteIfSent,
-  type TestEventResult,
-} from "./invites";
+import { syncInvite, syncInviteIfSent } from "./invites";
 import { SESSION_COOKIE_NAME, isUnlocked } from "./session";
 import { todayIsoDate } from "./util";
 import type { ActionResult, BookSearchResult, Member } from "./types";
@@ -213,72 +207,6 @@ export async function sendInvite(formData: FormData): Promise<void> {
 
   revalidatePath("/settings");
   revalidatePath("/");
-}
-
-const TEST_DURATION_MINUTES = 30;
-
-/**
- * Sends a throwaway invitation to a chosen few, to confirm invites actually
- * arrive before the real one goes out. Recipients arrive as member ids and
- * their addresses are looked up here, so this can't be used to mail an
- * arbitrary address.
- */
-export async function sendTestInvite(
-  formData: FormData,
-): Promise<ActionResult<TestEventResult>> {
-  try {
-    await requireUnlocked();
-
-    const summary = nonEmpty(formData, "summary") ?? "CLIT Club test invite";
-    const date = nonEmpty(formData, "date");
-    if (!date) return { ok: false, message: "Pick a date for the test." };
-    const startTime = nonEmpty(formData, "startTime");
-    if (!startTime || !/^\d{2}:\d{2}(:\d{2})?$/.test(startTime)) {
-      return { ok: false, message: "Pick a start time." };
-    }
-
-    const selected = new Set(
-      formData.getAll("recipients").filter((v): v is string => typeof v === "string"),
-    );
-    const members = await getAllMembers();
-    const emails = members
-      .filter((m) => selected.has(m.id) && m.active && m.email && m.email.trim() !== "")
-      .map((m) => m.email!);
-    if (emails.length === 0) {
-      return { ok: false, message: "Choose at least one person with an email to test with." };
-    }
-
-    const result = await sendTestEvent({
-      summary,
-      date,
-      startTime,
-      durationMinutes: TEST_DURATION_MINUTES,
-      emails,
-    });
-    return { ok: true, data: result };
-  } catch (e) {
-    // Also logged server-side: production strips the message on its way out.
-    console.error("sendTestInvite failed:", e);
-    return {
-      ok: false,
-      message: e instanceof Error ? e.message : "Couldn't send the test invite.",
-    };
-  }
-}
-
-export async function cancelTestInvite(eventId: string): Promise<ActionResult> {
-  try {
-    await requireUnlocked();
-    if (!eventId) return { ok: false, message: "Missing test event." };
-    await deleteTestEvent(eventId);
-    return { ok: true, data: null };
-  } catch (e) {
-    console.error("cancelTestInvite failed:", e);
-    return {
-      ok: false,
-      message: e instanceof Error ? e.message : "Couldn't cancel the test event.",
-    };
-  }
 }
 
 // --- Current book -----------------------------------------------------------

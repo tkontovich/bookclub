@@ -284,16 +284,3 @@ export async function patchEvent(
   return readEvent(json);
 }
 
-export async function deleteEvent(
-  accessToken: string,
-  calendarId: string,
-  eventId: string,
-): Promise<void> {
-  await calendarFetch(
-    accessToken,
-    `/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(
-      eventId,
-    )}?sendUpdates=all`,
-    { method: "DELETE" },
-  );
-}

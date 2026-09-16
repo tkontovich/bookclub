@@ -8,7 +8,6 @@ import { getClubSettings, getInvitableMembers } from "./data";
 import {
   GoogleAuthError,
   accessTokenFor,
-  deleteEvent,
   forgetAccessToken,
   insertEventWithMeet,
   loadCredentials,
@@ -182,61 +181,3 @@ export async function syncInviteIfSent(bookId: string): Promise<InviteOutcome | 
   return syncInvite(bookId);
 }
 
-// --- Test invites -----------------------------------------------------------
-//
-// A throwaway event for checking that invitations actually arrive, before the
-// real one goes to the whole club. Deliberately kept out of calendar_invites:
-// the book's own invite state must not be touched by a test.
-
-export type TestEventResult = {
-  eventId: string;
-  meetUrl: string | null;
-  recipients: number;
-};
-
-export async function sendTestEvent(options: {
-  summary: string;
-  date: string;
-  startTime: string;
-  durationMinutes: number;
-  emails: string[];
-}): Promise<TestEventResult> {
-  const credentials = await loadCredentials();
-  if (!credentials) throw new Error("Connect Google Calendar first.");
-
-  const settings = await getClubSettings();
-  const timeZone = settings.meeting_timezone;
-  const startTime = normalizeTime(options.startTime);
-  const endTime = addMinutes(startTime, options.durationMinutes);
-
-  const payload: EventPayload = {
-    summary: options.summary,
-    description: "Test invitation from the CLIT Club site. Safe to ignore or decline.",
-    start: {
-      dateTime: `${options.date}T${startTime}${zoneOffset(options.date, startTime, timeZone)}`,
-      timeZone,
-    },
-    end: {
-      dateTime: `${options.date}T${endTime}${zoneOffset(options.date, endTime, timeZone)}`,
-      timeZone,
-    },
-    attendees: options.emails.map((email) => ({ email })),
-  };
-
-  try {
-    const accessToken = await accessTokenFor(credentials.refresh_token);
-    const result = await insertEventWithMeet(accessToken, credentials.calendar_id, payload);
-    return { eventId: result.id, meetUrl: result.meetUrl, recipients: options.emails.length };
-  } catch (e) {
-    if (e instanceof GoogleAuthError) forgetAccessToken(credentials.refresh_token);
-    throw new Error(e instanceof Error ? e.message : "Couldn't reach Google.");
-  }
-}
-
-/** Removes a test event; Google mails the cancellation so calendars clear. */
-export async function deleteTestEvent(eventId: string): Promise<void> {
-  const credentials = await loadCredentials();
-  if (!credentials) throw new Error("Connect Google Calendar first.");
-  const accessToken = await accessTokenFor(credentials.refresh_token);
-  await deleteEvent(accessToken, credentials.calendar_id, eventId);
-}

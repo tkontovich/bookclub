@@ -131,8 +131,16 @@ export function DatePicker({
         className="pointer-events-none absolute bottom-0 left-4 h-px w-px opacity-0"
       />
 
+      {/* A fixed-width popover anchored to a narrow field runs off a phone
+          screen, so on small screens the calendar sits against the bottom of
+          the viewport instead, where it always fits and is easier to tap.
+          From `sm` up it's the usual popover under the field. */}
       {open && (
-        <div role="dialog" aria-label="Choose a date" className="date-pop absolute left-0 top-full z-30 mt-1 w-72 p-3">
+        <div
+          role="dialog"
+          aria-label="Choose a date"
+          className="date-pop fixed inset-x-4 bottom-4 z-30 p-3 sm:absolute sm:inset-x-auto sm:bottom-auto sm:left-0 sm:top-full sm:mt-1 sm:w-72"
+        >
           <div className="mb-2 flex items-center justify-between">
             <button
               type="button"

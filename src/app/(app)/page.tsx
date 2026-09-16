@@ -111,12 +111,16 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 }
 
 // Label ......................... value
+//
+// The value must be allowed to shrink and wrap: "Next meeting" carries a
+// date and a time, which runs past the right edge of a phone otherwise. The
+// leader keeps a minimum width so it never collapses to nothing.
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-baseline gap-2">
       <span className="label shrink-0">{label}</span>
-      <span className="-translate-y-1 flex-1 border-b border-dotted border-term-fg/30" />
-      <span className="shrink-0 text-sm text-term-bright">{value}</span>
+      <span className="-translate-y-1 min-w-3 flex-1 border-b border-dotted border-term-fg/30" />
+      <span className="min-w-0 text-right text-sm text-term-bright">{value}</span>
     </div>
   );
 }

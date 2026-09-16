@@ -11,7 +11,6 @@ import {
 import { PastBooksAdmin, type BookAdminView } from "@/components/PastBooksAdmin";
 import { MembersAdmin, type MemberAdminView } from "@/components/MembersAdmin";
 import { CalendarSettings } from "@/components/CalendarSettings";
-import { TestInvite } from "@/components/TestInvite";
 import type { ScoreEntry } from "@/components/ScoreRows";
 import { isUnlocked } from "@/lib/session";
 
@@ -92,14 +91,6 @@ export default async function SettingsPage({
         memberCount={activeMembers.length}
         banner={params.google}
       />
-
-      {credentials !== null && (
-        <TestInvite
-          members={activeMembers.map((m) => ({ id: m.id, name: m.name, email: m.email }))}
-          defaultDate={settings.next_meeting_date}
-          defaultStartTime={settings.meeting_start_time.slice(0, 5)}
-        />
-      )}
 
       <section className="panel space-y-3 p-5">
         <PastBooksAdmin
