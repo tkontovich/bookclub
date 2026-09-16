@@ -2,23 +2,10 @@ import Link from "next/link";
 import { disconnectGoogle, saveMeetingSettings, sendInvite } from "@/lib/actions";
 import { formatDate, formatMeetingRange, formatTimeOfDay } from "@/lib/util";
 import type { CalendarInvite } from "@/lib/types";
+import { DURATIONS, START_TIMES, formatDuration } from "@/lib/meeting-options";
 
 // Plain forms posting to server actions - no client state needed, so the
 // panel works even before React hydrates.
-
-const DURATIONS = [60, 90, 120, 150, 180];
-
-// Every half hour, 8:00 AM to 11:30 PM.
-const START_TIMES = Array.from({ length: 32 }, (_, i) => {
-  const minutes = 8 * 60 + i * 30;
-  return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
-});
-
-function formatDuration(minutes: number) {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m === 0 ? `${h} HR` : `${h} HR ${m} MIN`;
-}
 
 const BANNERS: Record<string, { text: string; tone: "good" | "bad" }> = {
   connected: { text: "Google Calendar connected.", tone: "good" },
