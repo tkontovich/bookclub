@@ -182,23 +182,6 @@ async function calendarFetch(
   return json as Record<string, unknown>;
 }
 
-export type CalendarInfo = {
-  id: string;
-  /** "hangoutsMeet" here means this calendar can generate Meet links. */
-  allowedConferenceSolutionTypes: string[];
-};
-
-export async function getPrimaryCalendar(accessToken: string): Promise<CalendarInfo> {
-  const json = await calendarFetch(accessToken, "/calendars/primary");
-  const conference = json.conferenceProperties as
-    | { allowedConferenceSolutionTypes?: string[] }
-    | undefined;
-  return {
-    id: typeof json.id === "string" ? json.id : "primary",
-    allowedConferenceSolutionTypes: conference?.allowedConferenceSolutionTypes ?? [],
-  };
-}
-
 export type EventPayload = {
   summary: string;
   description?: string;
@@ -251,6 +234,33 @@ export async function insertEvent(
     { method: "POST", body: JSON.stringify(body) },
   );
   return readEvent(json);
+}
+
+/**
+ * Creates the event with a Meet link attached.
+ *
+ * Whether a calendar can host Meet is readable from the calendar's own
+ * record, but that needs a broader scope than calendar.events - asking for
+ * it would mean requesting permission to read the whole calendar just to
+ * answer one question. So the link is simply requested, and if conferencing
+ * is what Google objects to, the event is created without it rather than
+ * losing the invitation altogether.
+ */
+export async function insertEventWithMeet(
+  accessToken: string,
+  calendarId: string,
+  payload: EventPayload,
+): Promise<EventResult> {
+  try {
+    return await insertEvent(accessToken, calendarId, payload, true);
+  } catch (e) {
+    if (e instanceof GoogleAuthError) throw e;
+    const detail = e instanceof Error ? e.message.toLowerCase() : "";
+    const aboutConferencing =
+      detail.includes("conference") || detail.includes("hangout") || detail.includes("meet");
+    if (!aboutConferencing) throw e;
+    return insertEvent(accessToken, calendarId, payload, false);
+  }
 }
 
 /**

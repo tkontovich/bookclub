@@ -3,9 +3,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import {
   OAUTH_STATE_COOKIE,
-  accessTokenFor,
   exchangeCodeForTokens,
-  getPrimaryCalendar,
   loadCredentials,
   saveCredentials,
 } from "@/lib/google";
@@ -40,20 +38,12 @@ export async function GET(request: Request) {
     const refreshToken = tokens.refresh_token ?? existing?.refresh_token;
     if (!refreshToken) throw new Error("Google didn't return a refresh token.");
 
-    // The primary calendar's id doubles as a label for which account is
-    // connected. Only shown when it actually looks like an address.
-    let connectedEmail: string | null = null;
-    try {
-      const accessToken = await accessTokenFor(refreshToken);
-      const calendar = await getPrimaryCalendar(accessToken);
-      connectedEmail = calendar.id.includes("@") ? calendar.id : null;
-    } catch {
-      // Not worth failing the connection over a cosmetic label.
-    }
-
+    // Naming the connected account would mean reading the calendar's own
+    // record, which needs a broader scope than calendar.events - not worth
+    // asking for permission to read a whole calendar just for a label.
     await saveCredentials({
       refresh_token: refreshToken,
-      connected_email: connectedEmail,
+      connected_email: null,
       calendar_id: "primary",
     });
     revalidatePath("/settings");

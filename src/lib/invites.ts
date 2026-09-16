@@ -10,8 +10,7 @@ import {
   accessTokenFor,
   deleteEvent,
   forgetAccessToken,
-  getPrimaryCalendar,
-  insertEvent,
+  insertEventWithMeet,
   loadCredentials,
   patchEvent,
   type EventPayload,
@@ -144,10 +143,7 @@ export async function syncInvite(bookId: string): Promise<InviteOutcome> {
         payload,
       );
     } else {
-      // Only ask for a Meet link if this calendar can actually make one.
-      const calendar = await getPrimaryCalendar(accessToken);
-      const canMeet = calendar.allowedConferenceSolutionTypes.includes("hangoutsMeet");
-      result = await insertEvent(accessToken, credentials.calendar_id, payload, canMeet);
+      result = await insertEventWithMeet(accessToken, credentials.calendar_id, payload);
     }
 
     await recordInvite({
@@ -229,9 +225,7 @@ export async function sendTestEvent(options: {
 
   try {
     const accessToken = await accessTokenFor(credentials.refresh_token);
-    const calendar = await getPrimaryCalendar(accessToken);
-    const canMeet = calendar.allowedConferenceSolutionTypes.includes("hangoutsMeet");
-    const result = await insertEvent(accessToken, credentials.calendar_id, payload, canMeet);
+    const result = await insertEventWithMeet(accessToken, credentials.calendar_id, payload);
     return { eventId: result.id, meetUrl: result.meetUrl, recipients: options.emails.length };
   } catch (e) {
     if (e instanceof GoogleAuthError) forgetAccessToken(credentials.refresh_token);
