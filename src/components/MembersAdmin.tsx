@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { addMember, removeMember, updateMember } from "@/lib/actions";
+import type { ActionResult } from "@/lib/types";
 import { Modal } from "./Modal";
 
 export type MemberAdminView = {
@@ -16,14 +17,13 @@ export function MembersAdmin({ members }: { members: MemberAdminView[] }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
+  // Actions return failures rather than throwing: a thrown error loses its
+  // message in production and surfaces as React error #441.
   function handleAdd(formData: FormData) {
     setError(null);
     startTransition(async () => {
-      try {
-        await addMember(formData);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Could not add that member.");
-      }
+      const outcome = await addMember(formData);
+      if (!outcome.ok) setError(outcome.message);
     });
   }
 
@@ -112,15 +112,15 @@ function MemberEditForm({
   const [error, setError] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
 
-  function run(action: (formData: FormData) => Promise<void>, formData: FormData) {
+  function run(
+    action: (formData: FormData) => Promise<ActionResult>,
+    formData: FormData,
+  ) {
     setError(null);
     startTransition(async () => {
-      try {
-        await action(formData);
-        onDone();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Could not save that member.");
-      }
+      const outcome = await action(formData);
+      if (outcome.ok) onDone();
+      else setError(outcome.message);
     });
   }
 

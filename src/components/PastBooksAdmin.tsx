@@ -116,16 +116,14 @@ function BookForm({
   const [error, setError] = useState<string | null>(null);
   const isCurrent = book?.status === "current";
 
+  // Actions return failures rather than throwing: a thrown error loses its
+  // message in production and surfaces as React error #441.
   function handleSubmit(formData: FormData) {
     setError(null);
     startTransition(async () => {
-      try {
-        if (book) await updateBook(formData);
-        else await addPastBook(formData);
-        onDone();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Could not save that book.");
-      }
+      const outcome = book ? await updateBook(formData) : await addPastBook(formData);
+      if (outcome.ok) onDone();
+      else setError(outcome.message);
     });
   }
 

@@ -31,15 +31,18 @@ export function TestInvite({
 
   const withEmail = members.filter((m) => m.email && m.email.trim() !== "");
 
+  // Actions return failures rather than throwing them: a thrown error loses
+  // its message in production and surfaces as React error #441.
   function handleSend(formData: FormData) {
     setError(null);
     setCancelled(false);
     startTransition(async () => {
-      try {
-        setResult(await sendTestInvite(formData));
-      } catch (e) {
+      const outcome = await sendTestInvite(formData);
+      if (outcome.ok) {
+        setResult(outcome.data);
+      } else {
         setResult(null);
-        setError(e instanceof Error ? e.message : "Couldn't send the test invite.");
+        setError(outcome.message);
       }
     });
   }
@@ -47,12 +50,12 @@ export function TestInvite({
   function handleCancel(eventId: string) {
     setError(null);
     startTransition(async () => {
-      try {
-        await cancelTestInvite(eventId);
+      const outcome = await cancelTestInvite(eventId);
+      if (outcome.ok) {
         setResult(null);
         setCancelled(true);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Couldn't cancel the test event.");
+      } else {
+        setError(outcome.message);
       }
     });
   }

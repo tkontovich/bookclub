@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { disconnectGoogle, saveMeetingSettings, sendInvite } from "@/lib/actions";
-import { formatDate, formatMeetingRange, formatTimeOfDay } from "@/lib/util";
+import { disconnectGoogle, sendInvite } from "@/lib/actions";
+import { formatDate, formatMeetingRange } from "@/lib/util";
 import type { CalendarInvite } from "@/lib/types";
-import { DURATIONS, START_TIMES, formatDuration } from "@/lib/meeting-options";
+import { MeetingTimeRow } from "./MeetingTimeRow";
 
 // Plain forms posting to server actions - no client state needed, so the
 // panel works even before React hydrates.
@@ -86,50 +86,11 @@ export function CalendarSettings({
         </p>
       )}
 
-      {/* Meeting time */}
-      <form action={saveMeetingSettings} className="space-y-3 border-t border-term-fg/20 pt-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <label htmlFor="startTime" className="label block">
-              Start time · Pacific
-            </label>
-            <select id="startTime" name="startTime" defaultValue={startTime} className="w-full">
-              {START_TIMES.map((t) => (
-                <option key={t} value={t}>
-                  {formatTimeOfDay(t)} PT
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <label htmlFor="durationMinutes" className="label block">
-              Duration
-            </label>
-            <select
-              id="durationMinutes"
-              name="durationMinutes"
-              defaultValue={durationMinutes}
-              className="w-full"
-            >
-              {DURATIONS.map((d) => (
-                <option key={d} value={d}>
-                  {formatDuration(d)}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <button type="submit" className="btn btn-primary">
-            Save meeting time
-          </button>
-          {invite?.status === "sent" && (
-            <span className="text-xs text-term-dim">
-              Saving moves the invite that&apos;s already out.
-            </span>
-          )}
-        </div>
-      </form>
+      <MeetingTimeRow
+        startTime={startTime}
+        durationMinutes={durationMinutes}
+        inviteSent={invite?.status === "sent"}
+      />
 
       {/* Upcoming invite */}
       <div className="space-y-2 border-t border-term-fg/20 pt-4">

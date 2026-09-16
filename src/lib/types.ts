@@ -63,6 +63,13 @@ export type CalendarInvite = {
   created_at: string;
 };
 
+/**
+ * What a server action hands back to a client component. Actions must not
+ * throw for expected failures: React replaces a thrown error's message with
+ * a generic "error #441" in production, so the reason never reaches anyone.
+ */
+export type ActionResult<T = null> = { ok: true; data: T } | { ok: false; message: string };
+
 export type BookSearchResult = {
   googleBooksId: string;
   title: string;

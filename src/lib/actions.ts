@@ -16,7 +16,7 @@ import {
 } from "./invites";
 import { SESSION_COOKIE_NAME, isUnlocked } from "./session";
 import { todayIsoDate } from "./util";
-import type { BookSearchResult, Member } from "./types";
+import type { ActionResult, BookSearchResult, Member } from "./types";
 
 /**
  * Every write goes through here. Server actions are POST endpoints that
@@ -78,21 +78,25 @@ function buildScoreRows(formData: FormData, members: Member[], bookId: string): 
 
 // --- Members ----------------------------------------------------------------
 
-export async function addMember(formData: FormData): Promise<void> {
-  await requireUnlocked();
-  const name = nonEmpty(formData, "name");
-  if (!name) throw new Error("Name is required.");
-  const email = validEmail(nonEmpty(formData, "email"));
+export async function addMember(formData: FormData): Promise<ActionResult> {
+  try {
+    await requireUnlocked();
+    const name = nonEmpty(formData, "name");
+    if (!name) return { ok: false, message: "Name is required." };
+    const email = validEmail(nonEmpty(formData, "email"));
 
-  const { error } = await getSupabase().from("members").insert({ name, email });
-  if (error) {
-    if (error.code === "23505") {
-      throw new Error(`"${name}" is already a member.`);
+    const { error } = await getSupabase().from("members").insert({ name, email });
+    if (error) {
+      if (error.code === "23505") return { ok: false, message: `"${name}" is already a member.` };
+      return { ok: false, message: error.message };
     }
-    throw new Error(error.message);
+    revalidatePath("/settings");
+    revalidatePath("/");
+    return { ok: true, data: null };
+  } catch (e) {
+    console.error("addMember failed:", e);
+    return { ok: false, message: e instanceof Error ? e.message : "Could not add that member." };
   }
-  revalidatePath("/settings");
-  revalidatePath("/");
 }
 
 /**
@@ -100,35 +104,50 @@ export async function addMember(formData: FormData): Promise<void> {
  * any event change, so syncing here would mail the whole club each time an
  * address is corrected - resending is an explicit choice instead.
  */
-export async function updateMember(formData: FormData): Promise<void> {
-  await requireUnlocked();
-  const memberId = nonEmpty(formData, "memberId");
-  if (!memberId) throw new Error("Missing member.");
-  const name = nonEmpty(formData, "name");
-  if (!name) throw new Error("Name is required.");
-  const email = validEmail(nonEmpty(formData, "email"));
+export async function updateMember(formData: FormData): Promise<ActionResult> {
+  try {
+    await requireUnlocked();
+    const memberId = nonEmpty(formData, "memberId");
+    if (!memberId) return { ok: false, message: "Missing member." };
+    const name = nonEmpty(formData, "name");
+    if (!name) return { ok: false, message: "Name is required." };
+    const email = validEmail(nonEmpty(formData, "email"));
 
-  const { error } = await getSupabase()
-    .from("members")
-    .update({ name, email })
-    .eq("id", memberId);
-  if (error) {
-    if (error.code === "23505") throw new Error(`"${name}" is already a member.`);
-    throw new Error(error.message);
+    const { error } = await getSupabase()
+      .from("members")
+      .update({ name, email })
+      .eq("id", memberId);
+    if (error) {
+      if (error.code === "23505") return { ok: false, message: `"${name}" is already a member.` };
+      return { ok: false, message: error.message };
+    }
+    revalidatePath("/settings");
+    revalidatePath("/");
+    return { ok: true, data: null };
+  } catch (e) {
+    console.error("updateMember failed:", e);
+    return { ok: false, message: e instanceof Error ? e.message : "Could not save that member." };
   }
-  revalidatePath("/settings");
-  revalidatePath("/");
 }
 
-export async function removeMember(formData: FormData): Promise<void> {
-  await requireUnlocked();
-  const memberId = nonEmpty(formData, "memberId");
-  if (!memberId) throw new Error("Missing member.");
+export async function removeMember(formData: FormData): Promise<ActionResult> {
+  try {
+    await requireUnlocked();
+    const memberId = nonEmpty(formData, "memberId");
+    if (!memberId) return { ok: false, message: "Missing member." };
 
-  const { error } = await getSupabase().from("members").update({ active: false }).eq("id", memberId);
-  if (error) throw new Error(error.message);
-  revalidatePath("/settings");
-  revalidatePath("/");
+    const { error } = await getSupabase()
+      .from("members")
+      .update({ active: false })
+      .eq("id", memberId);
+    if (error) return { ok: false, message: error.message };
+    revalidatePath("/settings");
+    revalidatePath("/");
+    return { ok: true, data: null };
+  } catch (e) {
+    console.error("removeMember failed:", e);
+    return { ok: false, message: e instanceof Error ? e.message : "Could not remove that member." };
+  }
 }
 
 // --- Google calendar --------------------------------------------------------
@@ -148,30 +167,38 @@ export async function disconnectGoogle(): Promise<void> {
 
 const ALLOWED_DURATIONS = [60, 90, 120, 150, 180];
 
-export async function saveMeetingSettings(formData: FormData): Promise<void> {
-  await requireUnlocked();
-  const startTime = nonEmpty(formData, "startTime");
-  if (!startTime || !/^\d{2}:\d{2}(:\d{2})?$/.test(startTime)) {
-    throw new Error("Pick a start time.");
+export async function saveMeetingSettings(formData: FormData): Promise<ActionResult> {
+  try {
+    await requireUnlocked();
+    const startTime = nonEmpty(formData, "startTime");
+    if (!startTime || !/^\d{2}:\d{2}(:\d{2})?$/.test(startTime)) {
+      return { ok: false, message: "Pick a start time." };
+    }
+    const duration = Number(formData.get("durationMinutes"));
+    if (!ALLOWED_DURATIONS.includes(duration)) {
+      return { ok: false, message: "Pick a meeting length." };
+    }
+
+    const { error } = await getSupabase()
+      .from("club_settings")
+      .update({
+        meeting_start_time: startTime.length === 5 ? `${startTime}:00` : startTime,
+        meeting_duration_minutes: duration,
+      })
+      .eq("id", true);
+    if (error) return { ok: false, message: error.message };
+
+    // An invite that's already out should move to the new time.
+    const currentBook = await getCurrentBook();
+    if (currentBook) await syncInviteIfSent(currentBook.id);
+
+    revalidatePath("/settings");
+    revalidatePath("/");
+    return { ok: true, data: null };
+  } catch (e) {
+    console.error("saveMeetingSettings failed:", e);
+    return { ok: false, message: e instanceof Error ? e.message : "Could not save the time." };
   }
-  const duration = Number(formData.get("durationMinutes"));
-  if (!ALLOWED_DURATIONS.includes(duration)) throw new Error("Pick a meeting length.");
-
-  const { error } = await getSupabase()
-    .from("club_settings")
-    .update({
-      meeting_start_time: startTime.length === 5 ? `${startTime}:00` : startTime,
-      meeting_duration_minutes: duration,
-    })
-    .eq("id", true);
-  if (error) throw new Error(error.message);
-
-  // An invite that's already out should move to the new time.
-  const currentBook = await getCurrentBook();
-  if (currentBook) await syncInviteIfSent(currentBook.id);
-
-  revalidatePath("/settings");
-  revalidatePath("/");
 }
 
 /** Sends the invite, or re-sends it to everyone on the current list. */
@@ -196,41 +223,62 @@ const TEST_DURATION_MINUTES = 30;
  * their addresses are looked up here, so this can't be used to mail an
  * arbitrary address.
  */
-export async function sendTestInvite(formData: FormData): Promise<TestEventResult> {
-  await requireUnlocked();
+export async function sendTestInvite(
+  formData: FormData,
+): Promise<ActionResult<TestEventResult>> {
+  try {
+    await requireUnlocked();
 
-  const summary = nonEmpty(formData, "summary") ?? "CLIT Club test invite";
-  const date = nonEmpty(formData, "date");
-  if (!date) throw new Error("Pick a date for the test.");
-  const startTime = nonEmpty(formData, "startTime");
-  if (!startTime || !/^\d{2}:\d{2}(:\d{2})?$/.test(startTime)) {
-    throw new Error("Pick a start time.");
+    const summary = nonEmpty(formData, "summary") ?? "CLIT Club test invite";
+    const date = nonEmpty(formData, "date");
+    if (!date) return { ok: false, message: "Pick a date for the test." };
+    const startTime = nonEmpty(formData, "startTime");
+    if (!startTime || !/^\d{2}:\d{2}(:\d{2})?$/.test(startTime)) {
+      return { ok: false, message: "Pick a start time." };
+    }
+
+    const selected = new Set(
+      formData.getAll("recipients").filter((v): v is string => typeof v === "string"),
+    );
+    const members = await getAllMembers();
+    const emails = members
+      .filter((m) => selected.has(m.id) && m.active && m.email && m.email.trim() !== "")
+      .map((m) => m.email!);
+    if (emails.length === 0) {
+      return { ok: false, message: "Choose at least one person with an email to test with." };
+    }
+
+    const result = await sendTestEvent({
+      summary,
+      date,
+      startTime,
+      durationMinutes: TEST_DURATION_MINUTES,
+      emails,
+    });
+    return { ok: true, data: result };
+  } catch (e) {
+    // Also logged server-side: production strips the message on its way out.
+    console.error("sendTestInvite failed:", e);
+    return {
+      ok: false,
+      message: e instanceof Error ? e.message : "Couldn't send the test invite.",
+    };
   }
-
-  const selected = new Set(
-    formData.getAll("recipients").filter((v): v is string => typeof v === "string"),
-  );
-  const members = await getAllMembers();
-  const emails = members
-    .filter((m) => selected.has(m.id) && m.active && m.email && m.email.trim() !== "")
-    .map((m) => m.email!);
-  if (emails.length === 0) {
-    throw new Error("Choose at least one person with an email to test with.");
-  }
-
-  return sendTestEvent({
-    summary,
-    date,
-    startTime,
-    durationMinutes: TEST_DURATION_MINUTES,
-    emails,
-  });
 }
 
-export async function cancelTestInvite(eventId: string): Promise<void> {
-  await requireUnlocked();
-  if (!eventId) throw new Error("Missing test event.");
-  await deleteTestEvent(eventId);
+export async function cancelTestInvite(eventId: string): Promise<ActionResult> {
+  try {
+    await requireUnlocked();
+    if (!eventId) return { ok: false, message: "Missing test event." };
+    await deleteTestEvent(eventId);
+    return { ok: true, data: null };
+  } catch (e) {
+    console.error("cancelTestInvite failed:", e);
+    return {
+      ok: false,
+      message: e instanceof Error ? e.message : "Couldn't cancel the test event.",
+    };
+  }
 }
 
 // --- Current book -----------------------------------------------------------
@@ -339,16 +387,25 @@ export async function lockBook(formData: FormData): Promise<void> {
 
 // --- Past books (backfilling history) ---------------------------------------
 
-export async function addPastBook(formData: FormData): Promise<void> {
+export async function addPastBook(formData: FormData): Promise<ActionResult> {
+  try {
+    return await addPastBookInner(formData);
+  } catch (e) {
+    console.error("addPastBook failed:", e);
+    return { ok: false, message: e instanceof Error ? e.message : "Could not add that book." };
+  }
+}
+
+async function addPastBookInner(formData: FormData): Promise<ActionResult> {
   await requireUnlocked();
   const title = nonEmpty(formData, "title");
-  if (!title) throw new Error("Title is required.");
+  if (!title) return { ok: false, message: "Title is required." };
 
   const pickerId = nonEmpty(formData, "pickerId");
-  if (!pickerId) throw new Error("Choose who picked this book.");
+  if (!pickerId) return { ok: false, message: "Choose who picked this book." };
 
   const dateDiscussed = nonEmpty(formData, "bookDate");
-  if (!dateDiscussed) throw new Error("Discussion date is required.");
+  if (!dateDiscussed) return { ok: false, message: "Discussion date is required." };
 
   const { data: book, error: bookError } = await getSupabase()
     .from("books")
@@ -363,7 +420,9 @@ export async function addPastBook(formData: FormData): Promise<void> {
     })
     .select("id")
     .single();
-  if (bookError || !book) throw new Error(bookError?.message ?? "Could not add the book.");
+  if (bookError || !book) {
+    return { ok: false, message: bookError?.message ?? "Could not add the book." };
+  }
 
   const members = await getAllMembers();
   const rows = buildScoreRows(formData, members, book.id).filter(
@@ -374,11 +433,12 @@ export async function addPastBook(formData: FormData): Promise<void> {
     const { error: scoresError } = await getSupabase()
       .from("scores")
       .upsert(rows, { onConflict: "book_id,member_id" });
-    if (scoresError) throw new Error(scoresError.message);
+    if (scoresError) return { ok: false, message: scoresError.message };
   }
 
   revalidatePath("/");
   revalidatePath("/settings");
+  return { ok: true, data: null };
 }
 
 /**
@@ -386,20 +446,29 @@ export async function addPastBook(formData: FormData): Promise<void> {
  * was discussed; for the book being read now it's the next meeting date,
  * which lives on club_settings rather than the book row.
  */
-export async function updateBook(formData: FormData): Promise<void> {
+export async function updateBook(formData: FormData): Promise<ActionResult> {
+  try {
+    return await updateBookInner(formData);
+  } catch (e) {
+    console.error("updateBook failed:", e);
+    return { ok: false, message: e instanceof Error ? e.message : "Could not save that book." };
+  }
+}
+
+async function updateBookInner(formData: FormData): Promise<ActionResult> {
   await requireUnlocked();
   const bookId = nonEmpty(formData, "bookId");
-  if (!bookId) throw new Error("Missing book.");
+  if (!bookId) return { ok: false, message: "Missing book." };
 
   const title = nonEmpty(formData, "title");
-  if (!title) throw new Error("Title is required.");
+  if (!title) return { ok: false, message: "Title is required." };
 
   const pickerId = nonEmpty(formData, "pickerId");
-  if (!pickerId) throw new Error("Choose who picked this book.");
+  if (!pickerId) return { ok: false, message: "Choose who picked this book." };
 
   const isCurrent = formData.get("status") === "current";
   const bookDate = nonEmpty(formData, "bookDate");
-  if (!isCurrent && !bookDate) throw new Error("Discussion date is required.");
+  if (!isCurrent && !bookDate) return { ok: false, message: "Discussion date is required." };
 
   const { error } = await getSupabase()
     .from("books")
@@ -412,14 +481,14 @@ export async function updateBook(formData: FormData): Promise<void> {
       ...(isCurrent ? {} : { date_discussed: bookDate }),
     })
     .eq("id", bookId);
-  if (error) throw new Error(error.message);
+  if (error) return { ok: false, message: error.message };
 
   if (isCurrent) {
     const { error: settingsError } = await getSupabase()
       .from("club_settings")
       .update({ next_meeting_date: bookDate })
       .eq("id", true);
-    if (settingsError) throw new Error(settingsError.message);
+    if (settingsError) return { ok: false, message: settingsError.message };
   }
 
   // Replace the whole score set so cleared entries actually disappear
@@ -433,11 +502,11 @@ export async function updateBook(formData: FormData): Promise<void> {
     .from("scores")
     .delete()
     .eq("book_id", bookId);
-  if (clearError) throw new Error(clearError.message);
+  if (clearError) return { ok: false, message: clearError.message };
 
   if (rows.length > 0) {
     const { error: insertError } = await getSupabase().from("scores").insert(rows);
-    if (insertError) throw new Error(insertError.message);
+    if (insertError) return { ok: false, message: insertError.message };
   }
 
   // A date change on the current book moves the meeting, and Google mails
@@ -446,4 +515,5 @@ export async function updateBook(formData: FormData): Promise<void> {
 
   revalidatePath("/");
   revalidatePath("/settings");
+  return { ok: true, data: null };
 }
