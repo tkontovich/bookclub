@@ -21,8 +21,8 @@
     "description": null,
     "google_books_id": "/works/OL37505411W",
     "picker_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
-    "status": "current",
-    "date_discussed": null,
+    "status": "past",
+    "date_discussed": "2026-09-22",
     "created_at": "2026-08-12T17:10:58.114243+00:00"
   },
   {
@@ -167,6 +167,19 @@
     "status": "past",
     "date_discussed": "2024-04-23",
     "created_at": "2026-08-12T16:35:40.291259+00:00"
+  },
+  {
+    "id": "8687bef2-a45e-4698-88df-1344be31a2bd",
+    "round_id": null,
+    "title": "The Haunting of Hill House",
+    "author": "Shirley Jackson",
+    "cover_url": "https://covers.openlibrary.org/b/id/4289014-L.jpg",
+    "description": null,
+    "google_books_id": "/works/OL3171069W",
+    "picker_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
+    "status": "current",
+    "date_discussed": null,
+    "created_at": "2026-09-24T01:38:09.773301+00:00"
   },
   {
     "id": "8c2c1da4-9caa-4961-8d7b-ad7ef24a4c24",

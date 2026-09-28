@@ -8,14 +8,6 @@
     "absent": true
   },
   {
-    "id": "032a252b-e649-4b99-8bf5-94b00662b2cc",
-    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
-    "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
-    "score": null,
-    "created_at": "2026-08-12T17:16:57.506571+00:00",
-    "absent": true
-  },
-  {
     "id": "04163e62-afbc-4933-9684-8bfe6a83c5bc",
     "book_id": "aa4a503c-632d-4ab0-99e1-3de61a06d7cd",
     "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
@@ -88,14 +80,6 @@
     "absent": false
   },
   {
-    "id": "0b5a5836-76b6-4013-967c-9e5f7fbe347e",
-    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
-    "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
-    "score": null,
-    "created_at": "2026-08-12T17:16:51.269927+00:00",
-    "absent": true
-  },
-  {
     "id": "0bac7514-817f-4604-865c-88d82c0b74ce",
     "book_id": "c7542d57-afde-4fef-a66e-bd4160a80d8a",
     "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
@@ -112,14 +96,6 @@
     "absent": false
   },
   {
-    "id": "0e372bf6-6dd6-4220-a25b-c3812d98c58a",
-    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
-    "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
-    "score": null,
-    "created_at": "2026-08-12T17:04:12.628826+00:00",
-    "absent": true
-  },
-  {
     "id": "0e4012de-4403-423c-87af-2ad25cbf8799",
     "book_id": "dcd0c351-f665-46ca-8229-6fc8f0626d21",
     "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
@@ -128,12 +104,28 @@
     "absent": true
   },
   {
+    "id": "10529411-270a-4df7-9cea-f0e8f12860d4",
+    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
+    "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
+    "score": 6,
+    "created_at": "2026-09-23T00:58:47.815275+00:00",
+    "absent": false
+  },
+  {
     "id": "10af8506-4017-4210-8541-1c8d7f12fdea",
     "book_id": "9cc7056a-f135-45a7-a774-189e14eb757f",
     "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
     "score": null,
     "created_at": "2026-08-12T17:15:50.260487+00:00",
     "absent": true
+  },
+  {
+    "id": "1156565f-c41a-4ee4-ba92-6c0ed73f2480",
+    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
+    "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
+    "score": 9,
+    "created_at": "2026-09-23T01:01:05.145542+00:00",
+    "absent": false
   },
   {
     "id": "116f50bc-a023-4da7-aafa-742395382fd0",
@@ -168,12 +160,12 @@
     "absent": false
   },
   {
-    "id": "1ad33273-34df-4351-9690-cb6585f9a3b8",
-    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
+    "id": "1c0aee58-848c-4c29-a959-ba6744695c68",
+    "book_id": "039bcd6e-4111-4238-8fa5-befa43403f20",
     "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
-    "score": null,
-    "created_at": "2026-08-12T17:04:12.628826+00:00",
-    "absent": true
+    "score": 7.8,
+    "created_at": "2026-09-23T02:40:45.961939+00:00",
+    "absent": false
   },
   {
     "id": "1ca8ef6a-0def-4200-a48f-68640ba7166a",
@@ -184,12 +176,12 @@
     "absent": false
   },
   {
-    "id": "203bece9-176b-436a-9a37-599c34536176",
-    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
-    "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
-    "score": 6.8,
-    "created_at": "2026-08-12T17:16:51.269927+00:00",
-    "absent": false
+    "id": "1d36cc8d-0799-4bdc-8792-a920cff106d5",
+    "book_id": "039bcd6e-4111-4238-8fa5-befa43403f20",
+    "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
+    "score": null,
+    "created_at": "2026-09-23T02:40:45.961939+00:00",
+    "absent": true
   },
   {
     "id": "204e7297-5fa2-4554-a6cc-92923c8ee9fe",
@@ -216,20 +208,28 @@
     "absent": false
   },
   {
-    "id": "226d0f71-bdbb-4e32-9300-5131642af2ee",
-    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
-    "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
-    "score": null,
-    "created_at": "2026-08-12T17:17:03.795366+00:00",
-    "absent": true
-  },
-  {
     "id": "22c9fe3d-c95f-46e5-afa7-23acde855e36",
     "book_id": "34fd6ce5-2a82-4c7e-a20e-f5225114629e",
     "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
     "score": null,
     "created_at": "2026-08-12T17:12:37.531481+00:00",
     "absent": true
+  },
+  {
+    "id": "26a12605-5e01-44eb-a51f-6a5334fa6e89",
+    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
+    "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
+    "score": 9,
+    "created_at": "2026-09-23T01:01:05.145542+00:00",
+    "absent": false
+  },
+  {
+    "id": "278cc39e-c7fc-4c48-a87c-179113facc38",
+    "book_id": "039bcd6e-4111-4238-8fa5-befa43403f20",
+    "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
+    "score": 7.4,
+    "created_at": "2026-09-23T02:40:45.961939+00:00",
+    "absent": false
   },
   {
     "id": "2790c4d5-588d-442a-87f0-95d46db3d66d",
@@ -261,14 +261,6 @@
     "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
     "score": null,
     "created_at": "2026-08-12T17:12:37.531481+00:00",
-    "absent": true
-  },
-  {
-    "id": "2aacc5bc-d91f-4db2-92ff-08205b1c17b1",
-    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
-    "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
-    "score": null,
-    "created_at": "2026-08-12T17:16:57.506571+00:00",
     "absent": true
   },
   {
@@ -304,20 +296,20 @@
     "absent": false
   },
   {
+    "id": "2e1cb14e-de35-4ecc-be70-635e3767c3c5",
+    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
+    "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
+    "score": 8.2,
+    "created_at": "2026-09-23T00:57:29.203415+00:00",
+    "absent": false
+  },
+  {
     "id": "31af5997-f197-4475-a292-662430673e40",
     "book_id": "6300e377-188e-4a66-86e1-1bf27620f909",
     "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
     "score": null,
     "created_at": "2026-08-12T17:05:57.817243+00:00",
     "absent": true
-  },
-  {
-    "id": "34551659-c44d-424b-9a84-8d648b18be0e",
-    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
-    "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
-    "score": 9,
-    "created_at": "2026-08-12T17:16:51.269927+00:00",
-    "absent": false
   },
   {
     "id": "34cbeed6-e167-475f-8d18-69baf9e77ffe",
@@ -333,6 +325,14 @@
     "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
     "score": 7.2,
     "created_at": "2026-08-12T17:15:27.911604+00:00",
+    "absent": false
+  },
+  {
+    "id": "37e0e13f-3bd5-4542-88f1-9f6d570c0702",
+    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
+    "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
+    "score": 8.5,
+    "created_at": "2026-09-23T00:59:38.210228+00:00",
     "absent": false
   },
   {
@@ -352,14 +352,6 @@
     "absent": true
   },
   {
-    "id": "3c0a0646-4a1a-48bb-8427-212aa0d9e9f4",
-    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
-    "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
-    "score": 7,
-    "created_at": "2026-08-12T17:16:51.269927+00:00",
-    "absent": false
-  },
-  {
     "id": "3c83e185-c47c-434a-8c05-569b7dad427c",
     "book_id": "749e1e1d-69dc-491d-a477-72937704683a",
     "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
@@ -376,12 +368,28 @@
     "absent": false
   },
   {
-    "id": "3d607b4e-f87d-4fc7-9369-35cbe8c07220",
-    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
-    "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
+    "id": "3db2070a-90bb-4e51-95ef-56e15ea1254d",
+    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
+    "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
+    "score": 8.5,
+    "created_at": "2026-09-23T00:57:29.203415+00:00",
+    "absent": false
+  },
+  {
+    "id": "3f742188-3326-4fde-834e-0e778e9e9873",
+    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
+    "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
     "score": null,
-    "created_at": "2026-08-12T17:03:45.192288+00:00",
+    "created_at": "2026-09-23T00:59:38.210228+00:00",
     "absent": true
+  },
+  {
+    "id": "3faa8d3c-b5bf-461d-a572-5b17ccb09d3e",
+    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
+    "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
+    "score": 7,
+    "created_at": "2026-09-23T01:01:05.145542+00:00",
+    "absent": false
   },
   {
     "id": "3feb9526-365a-4732-832f-90ab4a35542e",
@@ -400,12 +408,28 @@
     "absent": false
   },
   {
+    "id": "4028beb6-27d4-4124-893b-c45c29c6c009",
+    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
+    "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
+    "score": 6.9,
+    "created_at": "2026-09-23T00:58:47.815275+00:00",
+    "absent": false
+  },
+  {
     "id": "40e614dc-3114-49e9-8816-632104450c88",
     "book_id": "c7542d57-afde-4fef-a66e-bd4160a80d8a",
     "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
     "score": null,
     "created_at": "2026-08-12T17:14:54.104126+00:00",
     "absent": true
+  },
+  {
+    "id": "41641821-6898-49fc-a2e3-1de8ce805642",
+    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
+    "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
+    "score": 8.2,
+    "created_at": "2026-09-23T00:59:38.210228+00:00",
+    "absent": false
   },
   {
     "id": "41899bf6-cf0e-4cb3-92f9-a7d2e7484a81",
@@ -424,19 +448,19 @@
     "absent": true
   },
   {
+    "id": "42f37d45-bd15-4dbd-9fa1-fd02f5d2500d",
+    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
+    "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
+    "score": 8.5,
+    "created_at": "2026-09-23T00:59:38.210228+00:00",
+    "absent": false
+  },
+  {
     "id": "47178b65-a08b-4213-823c-1443dd8225cd",
     "book_id": "dcd0c351-f665-46ca-8229-6fc8f0626d21",
     "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
     "score": null,
     "created_at": "2026-08-12T17:12:45.778821+00:00",
-    "absent": true
-  },
-  {
-    "id": "47a9abfc-ef21-4e58-a002-99351ccc4d7c",
-    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
-    "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
-    "score": null,
-    "created_at": "2026-08-12T17:04:12.628826+00:00",
     "absent": true
   },
   {
@@ -454,6 +478,14 @@
     "score": null,
     "created_at": "2026-08-12T17:14:54.104126+00:00",
     "absent": true
+  },
+  {
+    "id": "4c923c60-10b0-44df-b59b-e23be0204b4b",
+    "book_id": "039bcd6e-4111-4238-8fa5-befa43403f20",
+    "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
+    "score": 7.3,
+    "created_at": "2026-09-23T02:40:45.961939+00:00",
+    "absent": false
   },
   {
     "id": "4d1bafb3-4709-45c0-847f-847a07e29ecc",
@@ -520,12 +552,12 @@
     "absent": false
   },
   {
-    "id": "5b0b1857-a7b7-4aa7-bca0-11f98c487f58",
-    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
-    "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
-    "score": null,
-    "created_at": "2026-08-12T17:16:57.506571+00:00",
-    "absent": true
+    "id": "5a90c956-f2aa-444d-ba44-8b1874eb56f9",
+    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
+    "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
+    "score": 6,
+    "created_at": "2026-09-23T01:01:05.145542+00:00",
+    "absent": false
   },
   {
     "id": "5b18a89e-5f8d-4d9b-864f-5e2623486143",
@@ -550,6 +582,14 @@
     "score": null,
     "created_at": "2026-08-12T17:05:57.817243+00:00",
     "absent": true
+  },
+  {
+    "id": "617b19f8-1f70-4157-8e95-26ddbcc19270",
+    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
+    "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
+    "score": 8.4,
+    "created_at": "2026-09-23T00:59:38.210228+00:00",
+    "absent": false
   },
   {
     "id": "630ac77f-5557-4f3c-aa73-eda4fc60c4df",
@@ -584,6 +624,14 @@
     "absent": true
   },
   {
+    "id": "6782b257-9b8d-4638-8e6a-3ea8c10c2dec",
+    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
+    "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
+    "score": 6,
+    "created_at": "2026-09-23T01:01:05.145542+00:00",
+    "absent": false
+  },
+  {
     "id": "6902982a-0c2c-481b-ac4b-e323dab0e71a",
     "book_id": "8c2c1da4-9caa-4961-8d7b-ad7ef24a4c24",
     "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
@@ -592,27 +640,19 @@
     "absent": false
   },
   {
+    "id": "6a31aaf0-1ddb-4f6f-adfe-d089e4d1ee4f",
+    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
+    "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
+    "score": 5.9,
+    "created_at": "2026-09-23T01:00:45.088659+00:00",
+    "absent": false
+  },
+  {
     "id": "6a5ec47e-5944-4646-818e-0566dc568cb0",
     "book_id": "a7484475-d9d4-43da-8428-b4254cb58427",
     "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
     "score": 8.3,
     "created_at": "2026-08-12T16:28:48.301856+00:00",
-    "absent": false
-  },
-  {
-    "id": "6a9e0484-9efe-4462-9d61-24d48551f689",
-    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
-    "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
-    "score": null,
-    "created_at": "2026-08-12T17:04:12.628826+00:00",
-    "absent": true
-  },
-  {
-    "id": "6b9dd932-3831-41a1-890f-5c6657c82f9e",
-    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
-    "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
-    "score": 6,
-    "created_at": "2026-08-12T17:16:51.269927+00:00",
     "absent": false
   },
   {
@@ -637,6 +677,14 @@
     "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
     "score": 7.8,
     "created_at": "2026-08-12T17:16:04.420017+00:00",
+    "absent": false
+  },
+  {
+    "id": "6d776ca3-0eaa-4820-b210-a2beb376b855",
+    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
+    "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
+    "score": 8.9,
+    "created_at": "2026-09-23T00:57:29.203415+00:00",
     "absent": false
   },
   {
@@ -696,14 +744,6 @@
     "absent": true
   },
   {
-    "id": "73cf7aa9-670e-430d-a8c2-982093f8ceb2",
-    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
-    "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
-    "score": null,
-    "created_at": "2026-08-12T17:17:03.795366+00:00",
-    "absent": true
-  },
-  {
     "id": "73d6d56e-9d1e-4817-a889-e06f776dbb67",
     "book_id": "34fd6ce5-2a82-4c7e-a20e-f5225114629e",
     "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
@@ -728,11 +768,35 @@
     "absent": false
   },
   {
+    "id": "75c6f803-e6db-49b9-b7d5-bb9d4440d000",
+    "book_id": "039bcd6e-4111-4238-8fa5-befa43403f20",
+    "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
+    "score": 8.2,
+    "created_at": "2026-09-23T02:40:45.961939+00:00",
+    "absent": false
+  },
+  {
     "id": "76fba8bb-15e2-4e59-a87d-fc0c46e2a0aa",
     "book_id": "a7484475-d9d4-43da-8428-b4254cb58427",
     "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
     "score": 8,
     "created_at": "2026-08-12T16:28:48.301856+00:00",
+    "absent": false
+  },
+  {
+    "id": "77441637-f202-4260-a9b3-bcf6e0e702af",
+    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
+    "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
+    "score": 7,
+    "created_at": "2026-09-23T00:59:38.210228+00:00",
+    "absent": false
+  },
+  {
+    "id": "7b8da2e4-60f3-42c2-8838-b7482d40c5a6",
+    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
+    "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
+    "score": 6.1,
+    "created_at": "2026-09-23T01:00:45.088659+00:00",
     "absent": false
   },
   {
@@ -750,14 +814,6 @@
     "score": 8.5,
     "created_at": "2026-08-12T17:15:19.222919+00:00",
     "absent": false
-  },
-  {
-    "id": "80afafd1-5968-418a-bd9e-e720b166a7e9",
-    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
-    "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
-    "score": null,
-    "created_at": "2026-08-12T17:03:45.192288+00:00",
-    "absent": true
   },
   {
     "id": "814acd8a-2224-4efc-b786-16551cec808d",
@@ -824,6 +880,14 @@
     "absent": true
   },
   {
+    "id": "8ed277c3-3891-4fc0-b4f6-4a67ae87a03e",
+    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
+    "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
+    "score": 7.6,
+    "created_at": "2026-09-23T01:00:45.088659+00:00",
+    "absent": false
+  },
+  {
     "id": "90edcb0c-d67d-4af9-a30f-1d756330c1ea",
     "book_id": "3083dd3e-2c00-477a-8add-e38e0c03ae88",
     "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
@@ -848,11 +912,19 @@
     "absent": true
   },
   {
-    "id": "982a39b6-18d7-4328-90d0-d90b2f263c4f",
-    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
-    "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
+    "id": "94c8d769-70f9-4879-a97a-64939d1786c0",
+    "book_id": "039bcd6e-4111-4238-8fa5-befa43403f20",
+    "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
+    "score": 8.5,
+    "created_at": "2026-09-23T02:40:45.961939+00:00",
+    "absent": false
+  },
+  {
+    "id": "97d74c61-c9a1-41cf-abce-a293873b8513",
+    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
+    "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
     "score": null,
-    "created_at": "2026-08-12T17:03:45.192288+00:00",
+    "created_at": "2026-09-23T01:01:05.145542+00:00",
     "absent": true
   },
   {
@@ -872,36 +944,12 @@
     "absent": false
   },
   {
-    "id": "98e4727c-cb4e-4150-8f62-3d822d3ec25c",
-    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
-    "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
-    "score": 7.5,
-    "created_at": "2026-08-12T17:16:51.269927+00:00",
-    "absent": false
-  },
-  {
     "id": "99117e60-f34c-46a7-bd59-c5b9dff6cba4",
     "book_id": "9421670d-f5b2-404c-8d0b-c9568cd6940c",
     "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
     "score": 8.1,
     "created_at": "2026-08-12T17:16:11.408902+00:00",
     "absent": false
-  },
-  {
-    "id": "9a79b19a-c6e7-46a9-8f85-208526cd0701",
-    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
-    "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
-    "score": null,
-    "created_at": "2026-08-12T17:16:57.506571+00:00",
-    "absent": true
-  },
-  {
-    "id": "9c48873c-adb7-4021-8b28-6c5131bf86f5",
-    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
-    "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
-    "score": null,
-    "created_at": "2026-08-12T17:16:57.506571+00:00",
-    "absent": true
   },
   {
     "id": "9ca9a05d-57db-4a23-8300-bc6bddf19c79",
@@ -936,6 +984,14 @@
     "absent": false
   },
   {
+    "id": "a23447c0-eed5-4a87-9b11-6e2c23edba7a",
+    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
+    "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
+    "score": 6.3,
+    "created_at": "2026-09-23T00:57:29.203415+00:00",
+    "absent": false
+  },
+  {
     "id": "a31b2a69-bdd8-4749-b989-2105e9db95c4",
     "book_id": "bddcf4e2-92d4-485e-8252-709858260d15",
     "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
@@ -952,12 +1008,12 @@
     "absent": false
   },
   {
-    "id": "aae4d26a-3768-45b0-8df1-b76be22347f8",
-    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
-    "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
-    "score": null,
-    "created_at": "2026-08-12T17:17:03.795366+00:00",
-    "absent": true
+    "id": "aabf5941-a083-449b-a3c6-a8fd7a623df6",
+    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
+    "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
+    "score": 7.6,
+    "created_at": "2026-09-23T00:57:29.203415+00:00",
+    "absent": false
   },
   {
     "id": "ad7976bd-da41-4d2d-b30c-161a4455fb4a",
@@ -966,6 +1022,14 @@
     "score": 1,
     "created_at": "2026-08-13T00:02:21.59899+00:00",
     "absent": false
+  },
+  {
+    "id": "adf80088-b4eb-4a6c-83c7-f848e77e8e98",
+    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
+    "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
+    "score": null,
+    "created_at": "2026-09-23T01:00:45.088659+00:00",
+    "absent": true
   },
   {
     "id": "af40907e-aa8b-4736-932b-dc851c88980f",
@@ -992,20 +1056,12 @@
     "absent": true
   },
   {
-    "id": "b0b2955d-698a-4da9-96fa-77c912a04f01",
+    "id": "b07e92ea-d46e-417b-a051-1cd8930caa14",
     "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
-    "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
-    "score": null,
-    "created_at": "2026-08-12T17:03:45.192288+00:00",
-    "absent": true
-  },
-  {
-    "id": "b1dac054-1118-42e6-9237-7ebf3e01044f",
-    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
     "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
-    "score": null,
-    "created_at": "2026-08-12T17:16:57.506571+00:00",
-    "absent": true
+    "score": 5.5,
+    "created_at": "2026-09-23T00:58:47.815275+00:00",
+    "absent": false
   },
   {
     "id": "b23c3151-c378-4daf-adfc-849aeb97b2fa",
@@ -1064,14 +1120,6 @@
     "absent": false
   },
   {
-    "id": "b656e701-b09e-48e7-98dd-a1f0d6a5d9b7",
-    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
-    "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
-    "score": null,
-    "created_at": "2026-08-12T17:04:12.628826+00:00",
-    "absent": true
-  },
-  {
     "id": "b65e1c32-7598-4b08-bd73-87f4b25086f7",
     "book_id": "bddcf4e2-92d4-485e-8252-709858260d15",
     "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
@@ -1080,12 +1128,20 @@
     "absent": false
   },
   {
-    "id": "b7354f0f-c4d0-4d1e-b62f-4194bcfef4f8",
-    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
-    "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
-    "score": null,
-    "created_at": "2026-08-12T17:04:12.628826+00:00",
-    "absent": true
+    "id": "b847d4fe-a3f2-49e7-a75f-3471ba88b4ce",
+    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
+    "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
+    "score": 8.2,
+    "created_at": "2026-09-23T00:58:47.815275+00:00",
+    "absent": false
+  },
+  {
+    "id": "b965c70f-4eb7-4a89-a5d6-065c791ee6d6",
+    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
+    "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
+    "score": 5,
+    "created_at": "2026-09-23T01:00:45.088659+00:00",
+    "absent": false
   },
   {
     "id": "ba07f5a6-ed2e-40ad-a21d-3ef7db37acdf",
@@ -1104,6 +1160,14 @@
     "absent": false
   },
   {
+    "id": "bac0bf23-1334-430f-b088-35f957427911",
+    "book_id": "039bcd6e-4111-4238-8fa5-befa43403f20",
+    "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
+    "score": 7.8,
+    "created_at": "2026-09-23T02:40:45.961939+00:00",
+    "absent": false
+  },
+  {
     "id": "bce7c8dd-2768-4f2f-9838-0cf70a9c7768",
     "book_id": "34fd6ce5-2a82-4c7e-a20e-f5225114629e",
     "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
@@ -1112,12 +1176,12 @@
     "absent": true
   },
   {
-    "id": "bd1932cc-8c0c-4aa5-8e95-479548201b96",
-    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
-    "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
-    "score": null,
-    "created_at": "2026-08-12T17:16:57.506571+00:00",
-    "absent": true
+    "id": "bde0ac92-2506-4816-a9b7-853224eba721",
+    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
+    "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
+    "score": 9,
+    "created_at": "2026-09-23T00:59:38.210228+00:00",
+    "absent": false
   },
   {
     "id": "be083a90-16f8-450e-b0ce-d8b0d630f588",
@@ -1134,6 +1198,14 @@
     "score": null,
     "created_at": "2026-08-12T17:14:43.29463+00:00",
     "absent": true
+  },
+  {
+    "id": "be9cb8f1-c914-47f4-a601-a839da4831ff",
+    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
+    "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
+    "score": 7.5,
+    "created_at": "2026-09-23T01:01:05.145542+00:00",
+    "absent": false
   },
   {
     "id": "bf5bbe32-85d4-4ea7-bab2-c837c745c78e",
@@ -1160,12 +1232,12 @@
     "absent": false
   },
   {
-    "id": "c22e2507-f9d3-4662-9c72-e7dee0cdad68",
+    "id": "c112cd3c-dd95-4da9-8d95-dd96c1e51654",
     "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
-    "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
-    "score": null,
-    "created_at": "2026-08-12T17:17:03.795366+00:00",
-    "absent": true
+    "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
+    "score": 9.1,
+    "created_at": "2026-09-23T00:59:38.210228+00:00",
+    "absent": false
   },
   {
     "id": "c2acbfa3-82c6-4559-911a-962393b57e9f",
@@ -1176,12 +1248,12 @@
     "absent": true
   },
   {
-    "id": "c395cea1-e2e0-4813-832d-0299a0b21447",
-    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
-    "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
-    "score": null,
-    "created_at": "2026-08-12T17:17:03.795366+00:00",
-    "absent": true
+    "id": "c3f8dd1f-502c-4979-9f17-b9e0bdc18cc2",
+    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
+    "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
+    "score": 7.2,
+    "created_at": "2026-09-23T01:00:45.088659+00:00",
+    "absent": false
   },
   {
     "id": "c4757669-d480-40cc-8210-ad06be51e390",
@@ -1197,14 +1269,6 @@
     "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
     "score": null,
     "created_at": "2026-08-12T17:14:54.104126+00:00",
-    "absent": true
-  },
-  {
-    "id": "c6d60b52-f6ea-4fde-bb4a-d0e4359f3aea",
-    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
-    "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
-    "score": null,
-    "created_at": "2026-08-12T17:17:03.795366+00:00",
     "absent": true
   },
   {
@@ -1224,19 +1288,19 @@
     "absent": false
   },
   {
+    "id": "cd19d8f2-42de-446d-8253-640d843edf61",
+    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
+    "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
+    "score": null,
+    "created_at": "2026-09-23T00:57:29.203415+00:00",
+    "absent": true
+  },
+  {
     "id": "ceb8f391-099e-42a2-a0ad-167815c04e7a",
     "book_id": "749e1e1d-69dc-491d-a477-72937704683a",
     "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
     "score": null,
     "created_at": "2026-08-12T17:15:19.222919+00:00",
-    "absent": true
-  },
-  {
-    "id": "d06a408f-f0e1-42f0-ac53-20cd0be5d222",
-    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
-    "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
-    "score": null,
-    "created_at": "2026-08-12T17:04:12.628826+00:00",
     "absent": true
   },
   {
@@ -1248,20 +1312,20 @@
     "absent": true
   },
   {
+    "id": "d555c1a9-6a63-4800-94dc-198475031c24",
+    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
+    "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
+    "score": 8.7,
+    "created_at": "2026-09-23T00:57:29.203415+00:00",
+    "absent": false
+  },
+  {
     "id": "d559bd18-fed3-4211-a371-08177c3646e1",
     "book_id": "749e1e1d-69dc-491d-a477-72937704683a",
     "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
     "score": 6.5,
     "created_at": "2026-08-12T17:15:19.222919+00:00",
     "absent": false
-  },
-  {
-    "id": "d5819b7d-6774-48e3-9547-1e95b32b2a76",
-    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
-    "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
-    "score": null,
-    "created_at": "2026-08-12T17:03:45.192288+00:00",
-    "absent": true
   },
   {
     "id": "d7f2a7bf-b20e-413d-b904-46fcbf001dbb",
@@ -1278,6 +1342,22 @@
     "score": null,
     "created_at": "2026-08-12T17:13:50.494766+00:00",
     "absent": true
+  },
+  {
+    "id": "db0cfdaa-2a86-4802-ae9f-74e62f5e0825",
+    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
+    "member_id": "3ed42a05-5b02-481f-a787-2f4a42997a10",
+    "score": 8,
+    "created_at": "2026-09-23T00:58:47.815275+00:00",
+    "absent": false
+  },
+  {
+    "id": "db1561b4-bcdc-485d-9d9b-9386087d4908",
+    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
+    "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
+    "score": 6.3,
+    "created_at": "2026-09-23T01:00:45.088659+00:00",
+    "absent": false
   },
   {
     "id": "db629d46-97f7-4a58-960b-afadfd704a0f",
@@ -1317,6 +1397,14 @@
     "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
     "score": 6.7,
     "created_at": "2026-08-12T17:15:13.151206+00:00",
+    "absent": false
+  },
+  {
+    "id": "de7a078c-e712-4079-a145-565078b66777",
+    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
+    "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
+    "score": 7.5,
+    "created_at": "2026-09-23T00:58:47.815275+00:00",
     "absent": false
   },
   {
@@ -1368,14 +1456,6 @@
     "absent": false
   },
   {
-    "id": "e8976f0d-d9e4-4151-a706-a19341eaa5de",
-    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
-    "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
-    "score": null,
-    "created_at": "2026-08-12T17:17:03.795366+00:00",
-    "absent": true
-  },
-  {
     "id": "ea5955c8-1307-48ea-bfca-c1bc71e0f7cb",
     "book_id": "0b5a78e5-41ec-4841-836c-89eef3169c7c",
     "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
@@ -1392,20 +1472,12 @@
     "absent": true
   },
   {
-    "id": "ecfcdf08-2d1d-41b4-abf8-939750843d15",
-    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
-    "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
-    "score": null,
-    "created_at": "2026-08-12T17:03:45.192288+00:00",
-    "absent": true
-  },
-  {
-    "id": "ed4b139f-2b10-401e-931f-1a952fb623af",
-    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
-    "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
-    "score": null,
-    "created_at": "2026-08-12T17:16:57.506571+00:00",
-    "absent": true
+    "id": "ec794a07-7405-4f24-b196-368ae26413fa",
+    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
+    "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
+    "score": 6.8,
+    "created_at": "2026-09-23T01:01:05.145542+00:00",
+    "absent": false
   },
   {
     "id": "ed9b973a-88c7-4b0f-b446-b3e8d92a55b6",
@@ -1432,12 +1504,28 @@
     "absent": true
   },
   {
-    "id": "ef84f1b5-a616-44e5-b86b-1a9f80ff3c29",
+    "id": "ef1cf89c-d0c0-4d74-8385-d25bc7be5a6d",
+    "book_id": "039bcd6e-4111-4238-8fa5-befa43403f20",
+    "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
+    "score": 7.1,
+    "created_at": "2026-09-23T02:40:45.961939+00:00",
+    "absent": false
+  },
+  {
+    "id": "f0e730e0-2485-4b94-a2e7-447d53f5845a",
+    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
+    "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
+    "score": 8.5,
+    "created_at": "2026-09-23T00:57:29.203415+00:00",
+    "absent": false
+  },
+  {
+    "id": "f146232a-518d-4264-9ba4-2420da522dec",
     "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
-    "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
-    "score": null,
-    "created_at": "2026-08-12T17:03:45.192288+00:00",
-    "absent": true
+    "member_id": "5171da29-2029-4fbc-910a-00066638b64f",
+    "score": 7.7,
+    "created_at": "2026-09-23T00:58:47.815275+00:00",
+    "absent": false
   },
   {
     "id": "f26a6cdf-269e-41cf-99bb-12cd3fe53d10",
@@ -1448,28 +1536,20 @@
     "absent": true
   },
   {
-    "id": "f2767a89-f568-4ada-9199-2d1125d89ee7",
-    "book_id": "c2ee798a-332c-41b5-a153-857afe6178ec",
-    "member_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
+    "id": "f441e5ab-e8bd-44ca-92cf-9dc031621ff7",
+    "book_id": "c3d823f7-058f-437c-a3b6-0533d62527d9",
+    "member_id": "d2f1e1a8-f42e-4904-93cd-ff27c5f7c7d1",
+    "score": 7.5,
+    "created_at": "2026-09-23T01:00:45.088659+00:00",
+    "absent": false
+  },
+  {
+    "id": "f769301c-ff42-4f3b-a48a-4036c3a37042",
+    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
+    "member_id": "a5bd78ab-1bbb-4678-a93a-c8027b5fee59",
     "score": null,
-    "created_at": "2026-08-12T17:17:03.795366+00:00",
+    "created_at": "2026-09-23T00:58:47.815275+00:00",
     "absent": true
-  },
-  {
-    "id": "f64da528-b5e7-4406-83d7-d823e83699d4",
-    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
-    "member_id": "4a6e8082-dc07-407d-9c01-8b7f2f11a4b9",
-    "score": 6,
-    "created_at": "2026-08-12T17:16:51.269927+00:00",
-    "absent": false
-  },
-  {
-    "id": "f696a928-1655-4b57-a1f0-be05766f1554",
-    "book_id": "1ba1c527-624a-47c3-89c1-42fcd3c1b57c",
-    "member_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
-    "score": 9,
-    "created_at": "2026-08-12T17:16:51.269927+00:00",
-    "absent": false
   },
   {
     "id": "f920ecda-aa46-420e-b634-3161aeb19f60",
@@ -1478,14 +1558,6 @@
     "score": 7.5,
     "created_at": "2026-08-12T17:15:38.422005+00:00",
     "absent": false
-  },
-  {
-    "id": "f941cdeb-8a77-4bab-830b-9e4f6a4dc77f",
-    "book_id": "d5f8e7be-f580-4922-8e33-06837acd4c3e",
-    "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
-    "score": null,
-    "created_at": "2026-08-12T17:04:12.628826+00:00",
-    "absent": true
   },
   {
     "id": "f9f5dfc8-d49e-4e0d-b2b5-faa364b17702",
@@ -1510,14 +1582,6 @@
     "score": 6.7,
     "created_at": "2026-08-12T17:15:27.911604+00:00",
     "absent": false
-  },
-  {
-    "id": "fe18e79e-d0b8-45b6-ae6b-49aee35bd486",
-    "book_id": "e56a6b9f-bcbf-4cd5-a77c-ca3d9e3850a8",
-    "member_id": "52636256-75a6-4eb2-95b5-0758355ed085",
-    "score": null,
-    "created_at": "2026-08-12T17:03:45.192288+00:00",
-    "absent": true
   },
   {
     "id": "ffdd0ba8-8f33-4e1f-8043-50f959124940",
