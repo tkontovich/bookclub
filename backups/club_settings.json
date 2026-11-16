@@ -1,7 +1,7 @@
 [
   {
     "id": true,
-    "next_meeting_date": "2026-11-03",
+    "next_meeting_date": "2026-12-15",
     "meeting_start_time": "17:30:00",
     "meeting_duration_minutes": 120,
     "meeting_timezone": "America/Los_Angeles"

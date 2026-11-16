@@ -177,8 +177,8 @@
     "description": null,
     "google_books_id": "/works/OL3171069W",
     "picker_id": "777519ea-2cb1-4a9e-aaa2-bc27d0a7abbc",
-    "status": "current",
-    "date_discussed": null,
+    "status": "past",
+    "date_discussed": "2026-11-03",
     "created_at": "2026-09-24T01:38:09.773301+00:00"
   },
   {
@@ -258,6 +258,19 @@
     "status": "past",
     "date_discussed": "2025-10-21",
     "created_at": "2026-08-12T17:14:43.119537+00:00"
+  },
+  {
+    "id": "b0d58b7f-0b7e-43f8-bb64-237822b11d17",
+    "round_id": null,
+    "title": "Small Things Like These",
+    "author": "Claire Keegan",
+    "cover_url": "https://covers.openlibrary.org/b/id/10507091-L.jpg",
+    "description": null,
+    "google_books_id": "/works/OL23020966W",
+    "picker_id": "d70a3d10-4e09-4583-8160-14f3523f9ddd",
+    "status": "current",
+    "date_discussed": null,
+    "created_at": "2026-11-13T23:22:18.675415+00:00"
   },
   {
     "id": "bddcf4e2-92d4-485e-8252-709858260d15",
